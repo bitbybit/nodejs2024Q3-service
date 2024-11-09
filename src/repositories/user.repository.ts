@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { User } from '../entities/user.entity';
 import { Artist } from '../entities/artist.entity';
 import { Album } from '../entities/album.entity';
