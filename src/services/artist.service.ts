@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Artist } from '../entities/artist.entity';
-import { ArtistRepository } from '../repositories/artist.repository';
 import { validate as validateUuid } from 'uuid';
+
+import { Artist } from '../entities/artist.entity';
+
+import { ArtistRepository } from '../repositories/artist.repository';
 
 export type ArtistResponse = {
   id: Artist['id'];
@@ -9,22 +11,26 @@ export type ArtistResponse = {
   grammy: Artist['grammy'];
 };
 
+export const artistToArtistResponse = ({
+  id,
+  name,
+  grammy,
+}: Artist): ArtistResponse => {
+  return {
+    id,
+    name,
+    grammy,
+  };
+};
+
 @Injectable()
 export class ArtistService {
   constructor(private readonly artistRepository: ArtistRepository) {}
 
-  #artistToArtistResponse({ id, name, grammy }: Artist): ArtistResponse {
-    return {
-      id,
-      name,
-      grammy,
-    };
-  }
-
   async getArtists(): Promise<ArtistResponse[]> {
     const artists = await this.artistRepository.getAllArtists();
 
-    return artists.map(this.#artistToArtistResponse);
+    return artists.map(artistToArtistResponse);
   }
 
   async getArtist(artistId: Artist['id']): Promise<ArtistResponse> {
@@ -41,7 +47,7 @@ export class ArtistService {
       );
     }
 
-    return this.#artistToArtistResponse(artist);
+    return artistToArtistResponse(artist);
   }
 
   async createArtist({
@@ -65,7 +71,7 @@ export class ArtistService {
 
     const artist = await this.artistRepository.addArtist(name, grammy);
 
-    return this.#artistToArtistResponse(artist);
+    return artistToArtistResponse(artist);
   }
 
   async updateArtist(
@@ -113,7 +119,7 @@ export class ArtistService {
       grammy,
     });
 
-    return this.#artistToArtistResponse(updatedArtist);
+    return artistToArtistResponse(updatedArtist);
   }
 
   async removeArtist(artistId: Artist['id']): Promise<void> {

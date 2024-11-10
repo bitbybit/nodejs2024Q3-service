@@ -1,8 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
+
 import { Track } from '../entities/track.entity';
 import { Artist } from '../entities/artist.entity';
 import { Album } from '../entities/album.entity';
+
 import { TrackRepository } from '../repositories/track.repository';
 import { ArtistRepository } from '../repositories/artist.repository';
 import { AlbumRepository } from '../repositories/album.repository';
@@ -15,6 +17,22 @@ export type TrackResponse = {
   duration: Track['duration'];
 };
 
+export const trackToTrackResponse = ({
+  id,
+  name,
+  duration,
+  artist,
+  album,
+}: Track): TrackResponse => {
+  return {
+    id,
+    name,
+    artistId: artist?.id ?? null,
+    albumId: album?.id ?? null,
+    duration,
+  };
+};
+
 @Injectable()
 export class TrackService {
   constructor(
@@ -23,26 +41,10 @@ export class TrackService {
     private readonly albumRepository: AlbumRepository,
   ) {}
 
-  #trackToTrackResponse({
-    id,
-    name,
-    duration,
-    artist,
-    album,
-  }: Track): TrackResponse {
-    return {
-      id,
-      name,
-      artistId: artist?.id ?? null,
-      albumId: album?.id ?? null,
-      duration,
-    };
-  }
-
   async getTracks(): Promise<TrackResponse[]> {
     const tracks = await this.trackRepository.getAllTracks();
 
-    return tracks.map(this.#trackToTrackResponse);
+    return tracks.map(trackToTrackResponse);
   }
 
   async getTrack(trackId: Track['id']): Promise<TrackResponse> {
@@ -59,7 +61,7 @@ export class TrackService {
       );
     }
 
-    return this.#trackToTrackResponse(track);
+    return trackToTrackResponse(track);
   }
 
   async createTrack({
@@ -130,7 +132,7 @@ export class TrackService {
       albumId,
     );
 
-    return this.#trackToTrackResponse(track);
+    return trackToTrackResponse(track);
   }
 
   async updateTrack(
@@ -233,7 +235,7 @@ export class TrackService {
       duration,
     });
 
-    return this.#trackToTrackResponse(updatedTrack);
+    return trackToTrackResponse(updatedTrack);
   }
 
   async removeTrack(trackId: Track['id']): Promise<void> {

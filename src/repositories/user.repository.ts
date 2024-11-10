@@ -1,8 +1,6 @@
-import { User } from '../entities/user.entity';
-import { Artist } from '../entities/artist.entity';
-import { Album } from '../entities/album.entity';
-import { Track } from '../entities/track.entity';
 import { Injectable } from '@nestjs/common';
+
+import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UserRepository {
@@ -25,9 +23,6 @@ export class UserRepository {
     user.login = login;
     user.password = password;
     user.version = 1;
-    user.favoriteArtists = [];
-    user.favoriteAlbums = [];
-    user.favoriteTracks = [];
 
     this.users.push(user);
 
@@ -54,116 +49,5 @@ export class UserRepository {
 
   async removeUser(userId: User['id']): Promise<void> {
     this.users = this.users.filter((user) => user.id !== userId);
-  }
-
-  async addFavoriteArtist(
-    userId: User['id'],
-    artistId: Artist['id'],
-  ): Promise<void> {
-    const user = this.users.find((user) => user.id === userId);
-
-    if (
-      user !== undefined &&
-      !user.favoriteArtists.some((artist) => artist.id === artistId)
-    ) {
-      const artist = { id: artistId } as Artist;
-
-      user.favoriteArtists.push(artist);
-    }
-  }
-
-  async removeFavoriteArtist(
-    userId: User['id'],
-    artistId: Artist['id'],
-  ): Promise<void> {
-    const user = this.users.find((user) => user.id === userId);
-
-    if (user !== undefined) {
-      user.favoriteArtists = user.favoriteArtists.filter(
-        (artist) => artist.id !== artistId,
-      );
-    }
-  }
-
-  async removeDeletedArtistFromFavorites(
-    artistId: Artist['id'],
-  ): Promise<void> {
-    this.users.forEach((user) => {
-      user.favoriteArtists = user.favoriteArtists.filter(
-        (artist) => artist.id !== artistId,
-      );
-    });
-  }
-
-  async addFavoriteAlbum(
-    userId: User['id'],
-    albumId: Album['id'],
-  ): Promise<void> {
-    const user = this.users.find((user) => user.id === userId);
-
-    if (
-      user !== undefined &&
-      !user.favoriteAlbums.some((album) => album.id === albumId)
-    ) {
-      const album = { id: albumId } as Album;
-      user.favoriteAlbums.push(album);
-    }
-  }
-
-  async removeFavoriteAlbum(
-    userId: User['id'],
-    albumId: Album['id'],
-  ): Promise<void> {
-    const user = this.users.find((user) => user.id === userId);
-
-    if (user !== undefined) {
-      user.favoriteAlbums = user.favoriteAlbums.filter(
-        (album) => album.id !== albumId,
-      );
-    }
-  }
-
-  async removeDeletedAlbumFromFavorites(albumId: Album['id']): Promise<void> {
-    this.users.forEach((user) => {
-      user.favoriteAlbums = user.favoriteAlbums.filter(
-        (album) => album.id !== albumId,
-      );
-    });
-  }
-
-  async addFavoriteTrack(
-    userId: User['id'],
-    trackId: Track['id'],
-  ): Promise<void> {
-    const user = this.users.find((user) => user.id === userId);
-
-    if (
-      user !== undefined &&
-      !user.favoriteTracks.some((track) => track.id === trackId)
-    ) {
-      const track = { id: trackId } as Track;
-      user.favoriteTracks.push(track);
-    }
-  }
-
-  async removeFavoriteTrack(
-    userId: User['id'],
-    trackId: Track['id'],
-  ): Promise<void> {
-    const user = this.users.find((user) => user.id === userId);
-
-    if (user !== undefined) {
-      user.favoriteTracks = user.favoriteTracks.filter(
-        (track) => track.id !== trackId,
-      );
-    }
-  }
-
-  async removeDeletedTrackFromFavorites(trackId: Track['id']): Promise<void> {
-    this.users.forEach((user) => {
-      user.favoriteTracks = user.favoriteTracks.filter(
-        (track) => track.id !== trackId,
-      );
-    });
   }
 }

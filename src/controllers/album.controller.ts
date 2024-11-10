@@ -9,7 +9,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+
 import { Album } from '../entities/album.entity';
+
 import { type AlbumResponse, AlbumService } from '../services/album.service';
 
 @Controller('album')

@@ -9,7 +9,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+
 import { User } from '../entities/user.entity';
+
 import { type UserResponse, UserService } from '../services/user.service';
 
 @Controller('user')

@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
+
 import { User } from '../entities/user.entity';
+
 import { UserRepository } from '../repositories/user.repository';
 
 export type UserResponse = {
@@ -11,30 +13,30 @@ export type UserResponse = {
   updatedAt: User['updatedAt'];
 };
 
-@Injectable()
-export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
-
-  #userToUserResponse({
+export const userToUserResponse = ({
+  id,
+  login,
+  version,
+  createdAt,
+  updatedAt,
+}: User): UserResponse => {
+  return {
     id,
     login,
     version,
     createdAt,
     updatedAt,
-  }: User): UserResponse {
-    return {
-      id,
-      login,
-      version,
-      createdAt,
-      updatedAt,
-    };
-  }
+  };
+};
+
+@Injectable()
+export class UserService {
+  constructor(private readonly userRepository: UserRepository) {}
 
   async getUsers(): Promise<UserResponse[]> {
     const users = await this.userRepository.getAllUsers();
 
-    return users.map(this.#userToUserResponse);
+    return users.map(userToUserResponse);
   }
 
   async getUser(userId: User['id']): Promise<UserResponse> {
@@ -51,7 +53,7 @@ export class UserService {
       );
     }
 
-    return this.#userToUserResponse(user);
+    return userToUserResponse(user);
   }
 
   async createUser({
@@ -75,7 +77,7 @@ export class UserService {
 
     const user = await this.userRepository.addUser(login, password);
 
-    return this.#userToUserResponse(user);
+    return userToUserResponse(user);
   }
 
   async updateUserPassword(
@@ -127,7 +129,7 @@ export class UserService {
       password: newPassword,
     });
 
-    return this.#userToUserResponse(updatedUser);
+    return userToUserResponse(updatedUser);
   }
 
   async removeUser(userId: User['id']): Promise<void> {

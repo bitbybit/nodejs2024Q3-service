@@ -9,7 +9,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+
 import { Artist } from '../entities/artist.entity';
+
 import { type ArtistResponse, ArtistService } from '../services/artist.service';
 
 @Controller('artist')

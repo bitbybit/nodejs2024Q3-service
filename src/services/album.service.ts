@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
+
 import { Album } from '../entities/album.entity';
 import { Artist } from '../entities/artist.entity';
+
 import { AlbumRepository } from '../repositories/album.repository';
 import { ArtistRepository } from '../repositories/artist.repository';
 
@@ -12,6 +14,20 @@ export type AlbumResponse = {
   artistId: Album['artist']['id'] | null;
 };
 
+export const albumToAlbumResponse = ({
+  id,
+  name,
+  year,
+  artist,
+}: Album): AlbumResponse => {
+  return {
+    id,
+    name,
+    year,
+    artistId: artist?.id ?? null,
+  };
+};
+
 @Injectable()
 export class AlbumService {
   constructor(
@@ -19,19 +35,10 @@ export class AlbumService {
     private readonly artistRepository: ArtistRepository,
   ) {}
 
-  #albumToAlbumResponse({ id, name, year, artist }: Album): AlbumResponse {
-    return {
-      id,
-      name,
-      year,
-      artistId: artist?.id ?? null,
-    };
-  }
-
   async getAlbums(): Promise<AlbumResponse[]> {
     const albums = await this.albumRepository.getAllAlbums();
 
-    return albums.map(this.#albumToAlbumResponse);
+    return albums.map(albumToAlbumResponse);
   }
 
   async getAlbum(albumId: Album['id']): Promise<AlbumResponse> {
@@ -48,7 +55,7 @@ export class AlbumService {
       );
     }
 
-    return this.#albumToAlbumResponse(album);
+    return albumToAlbumResponse(album);
   }
 
   async createAlbum({
@@ -93,7 +100,7 @@ export class AlbumService {
 
     const album = await this.albumRepository.addAlbum(name, year, artistId);
 
-    return this.#albumToAlbumResponse(album);
+    return albumToAlbumResponse(album);
   }
 
   async updateAlbum(
@@ -168,7 +175,7 @@ export class AlbumService {
       } as Artist,
     });
 
-    return this.#albumToAlbumResponse(updatedAlbum);
+    return albumToAlbumResponse(updatedAlbum);
   }
 
   async removeAlbum(albumId: Album['id']): Promise<void> {

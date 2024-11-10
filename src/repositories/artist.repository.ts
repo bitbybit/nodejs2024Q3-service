@@ -1,17 +1,24 @@
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+
 import { Artist } from '../entities/artist.entity';
-import { UserRepository } from './user.repository';
+
 import { TrackRepository } from './track.repository';
 import { AlbumRepository } from './album.repository';
-import { Injectable } from '@nestjs/common';
+import { FavoritesRepository } from './favorites.repository';
 
 @Injectable()
 export class ArtistRepository {
   private artists: Artist[] = [];
 
   constructor(
-    private readonly userRepository: UserRepository,
+    @Inject(forwardRef(() => TrackRepository))
     private readonly trackRepository: TrackRepository,
+
+    @Inject(forwardRef(() => AlbumRepository))
     private readonly albumRepository: AlbumRepository,
+
+    @Inject(forwardRef(() => FavoritesRepository))
+    private readonly favoritesRepository: FavoritesRepository,
   ) {}
 
   async getAllArtists(): Promise<Artist[]> {
@@ -54,7 +61,7 @@ export class ArtistRepository {
   }
 
   async removeArtist(artistId: Artist['id']): Promise<void> {
-    await this.userRepository.removeDeletedArtistFromFavorites(artistId);
+    await this.favoritesRepository.removeDeletedArtistFromFavorites(artistId);
     await this.trackRepository.removeArtistReference(artistId);
     await this.albumRepository.removeArtistReference(artistId);
 

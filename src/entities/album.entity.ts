@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+
 import { Artist } from './artist.entity';
 import { Track } from './track.entity';
 

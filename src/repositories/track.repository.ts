@@ -1,14 +1,19 @@
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+
 import { Track } from '../entities/track.entity';
 import { Artist } from '../entities/artist.entity';
 import { Album } from '../entities/album.entity';
-import { UserRepository } from './user.repository';
-import { Injectable } from '@nestjs/common';
+
+import { FavoritesRepository } from './favorites.repository';
 
 @Injectable()
 export class TrackRepository {
   private tracks: Track[] = [];
 
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    @Inject(forwardRef(() => FavoritesRepository))
+    private readonly favoritesRepository: FavoritesRepository,
+  ) {}
 
   async getAllTracks(): Promise<Track[]> {
     return this.tracks;
@@ -53,7 +58,7 @@ export class TrackRepository {
   }
 
   async removeTrack(trackId: Track['id']): Promise<void> {
-    await this.userRepository.removeDeletedTrackFromFavorites(trackId);
+    await this.favoritesRepository.removeDeletedTrackFromFavorites(trackId);
 
     this.tracks = this.tracks.filter((track) => track.id !== trackId);
   }
