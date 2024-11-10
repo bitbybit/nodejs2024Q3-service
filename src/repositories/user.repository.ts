@@ -2,7 +2,9 @@ import { User } from '../entities/user.entity';
 import { Artist } from '../entities/artist.entity';
 import { Album } from '../entities/album.entity';
 import { Track } from '../entities/track.entity';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class UserRepository {
   private users: User[] = [];
 
