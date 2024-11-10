@@ -7,19 +7,18 @@ import { Artist } from '../entities/artist.entity';
 import { AlbumRepository } from '../repositories/album.repository';
 import { ArtistRepository } from '../repositories/artist.repository';
 
-export type AlbumResponse = {
-  id: Album['id'];
-  name: Album['name'];
-  year: Album['year'];
-  artistId: Album['artist']['id'] | null;
-};
+import {
+  AlbumCreateDto,
+  AlbumResponseDto,
+  AlbumUpdateDto,
+} from '../dtos/album.dto';
 
 export const albumToAlbumResponse = ({
   id,
   name,
   year,
   artist,
-}: Album): AlbumResponse => {
+}: Album): AlbumResponseDto => {
   return {
     id,
     name,
@@ -35,13 +34,13 @@ export class AlbumService {
     private readonly artistRepository: ArtistRepository,
   ) {}
 
-  async getAlbums(): Promise<AlbumResponse[]> {
+  async getAlbums(): Promise<AlbumResponseDto[]> {
     const albums = await this.albumRepository.getAllAlbums();
 
     return albums.map(albumToAlbumResponse);
   }
 
-  async getAlbum(albumId: Album['id']): Promise<AlbumResponse> {
+  async getAlbum(albumId: Album['id']): Promise<AlbumResponseDto> {
     if (!validateUuid(albumId)) {
       throw new HttpException('Album id is invalid', HttpStatus.BAD_REQUEST);
     }
@@ -62,11 +61,7 @@ export class AlbumService {
     name,
     year,
     artistId,
-  }: {
-    name: Album['name'];
-    year: Album['year'];
-    artistId: Album['artist']['id'] | null;
-  }): Promise<AlbumResponse> {
+  }: AlbumCreateDto): Promise<AlbumResponseDto> {
     const isValidName = typeof name === 'string' && name?.trim() !== '';
 
     if (!isValidName) {
@@ -105,16 +100,8 @@ export class AlbumService {
 
   async updateAlbum(
     albumId: Album['id'],
-    {
-      name,
-      year,
-      artistId,
-    }: {
-      name?: Album['name'];
-      year?: Album['year'];
-      artistId?: Album['artist']['id'] | null;
-    },
-  ): Promise<AlbumResponse> {
+    { name, year, artistId }: AlbumUpdateDto,
+  ): Promise<AlbumResponseDto> {
     if (!validateUuid(albumId)) {
       throw new HttpException('Album id is invalid', HttpStatus.BAD_REQUEST);
     }

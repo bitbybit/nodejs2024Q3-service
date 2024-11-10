@@ -9,13 +9,11 @@ import { TrackRepository } from '../repositories/track.repository';
 import { ArtistRepository } from '../repositories/artist.repository';
 import { AlbumRepository } from '../repositories/album.repository';
 
-export type TrackResponse = {
-  id: Track['id'];
-  name: Track['name'];
-  artistId: Track['artist']['id'] | null;
-  albumId: Track['album']['id'] | null;
-  duration: Track['duration'];
-};
+import {
+  TrackCreateDto,
+  TrackResponseDto,
+  TrackUpdateDto,
+} from '../dtos/track.dto';
 
 export const trackToTrackResponse = ({
   id,
@@ -23,7 +21,7 @@ export const trackToTrackResponse = ({
   duration,
   artist,
   album,
-}: Track): TrackResponse => {
+}: Track): TrackResponseDto => {
   return {
     id,
     name,
@@ -41,13 +39,13 @@ export class TrackService {
     private readonly albumRepository: AlbumRepository,
   ) {}
 
-  async getTracks(): Promise<TrackResponse[]> {
+  async getTracks(): Promise<TrackResponseDto[]> {
     const tracks = await this.trackRepository.getAllTracks();
 
     return tracks.map(trackToTrackResponse);
   }
 
-  async getTrack(trackId: Track['id']): Promise<TrackResponse> {
+  async getTrack(trackId: Track['id']): Promise<TrackResponseDto> {
     if (!validateUuid(trackId)) {
       throw new HttpException('Track id is invalid', HttpStatus.BAD_REQUEST);
     }
@@ -69,12 +67,7 @@ export class TrackService {
     artistId,
     albumId,
     duration,
-  }: {
-    name: Track['name'];
-    artistId: Track['artist']['id'] | null;
-    albumId: Track['album']['id'] | null;
-    duration: Track['duration'];
-  }): Promise<TrackResponse> {
+  }: TrackCreateDto): Promise<TrackResponseDto> {
     const isValidName = typeof name === 'string' && name?.trim() !== '';
 
     if (!isValidName) {
@@ -137,18 +130,8 @@ export class TrackService {
 
   async updateTrack(
     trackId: Track['id'],
-    {
-      name,
-      artistId,
-      albumId,
-      duration,
-    }: {
-      name?: Track['name'];
-      artistId?: Track['artist']['id'] | null;
-      albumId?: Track['album']['id'] | null;
-      duration?: Track['duration'];
-    },
-  ): Promise<TrackResponse> {
+    { name, artistId, albumId, duration }: TrackUpdateDto,
+  ): Promise<TrackResponseDto> {
     if (!validateUuid(trackId)) {
       throw new HttpException('Track id is invalid', HttpStatus.BAD_REQUEST);
     }

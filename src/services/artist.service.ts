@@ -5,17 +5,17 @@ import { Artist } from '../entities/artist.entity';
 
 import { ArtistRepository } from '../repositories/artist.repository';
 
-export type ArtistResponse = {
-  id: Artist['id'];
-  name: Artist['name'];
-  grammy: Artist['grammy'];
-};
+import {
+  ArtistCreateDto,
+  ArtistResponseDto,
+  ArtistUpdateDto,
+} from '../dtos/artist.dto';
 
 export const artistToArtistResponse = ({
   id,
   name,
   grammy,
-}: Artist): ArtistResponse => {
+}: Artist): ArtistResponseDto => {
   return {
     id,
     name,
@@ -27,13 +27,13 @@ export const artistToArtistResponse = ({
 export class ArtistService {
   constructor(private readonly artistRepository: ArtistRepository) {}
 
-  async getArtists(): Promise<ArtistResponse[]> {
+  async getArtists(): Promise<ArtistResponseDto[]> {
     const artists = await this.artistRepository.getAllArtists();
 
     return artists.map(artistToArtistResponse);
   }
 
-  async getArtist(artistId: Artist['id']): Promise<ArtistResponse> {
+  async getArtist(artistId: Artist['id']): Promise<ArtistResponseDto> {
     if (!validateUuid(artistId)) {
       throw new HttpException('Artist id is invalid', HttpStatus.BAD_REQUEST);
     }
@@ -53,10 +53,7 @@ export class ArtistService {
   async createArtist({
     name,
     grammy,
-  }: {
-    name: Artist['name'];
-    grammy: Artist['grammy'];
-  }): Promise<ArtistResponse> {
+  }: ArtistCreateDto): Promise<ArtistResponseDto> {
     const isValidName = typeof name === 'string' && name?.trim() !== '';
 
     if (!isValidName) {
@@ -76,14 +73,8 @@ export class ArtistService {
 
   async updateArtist(
     artistId: Artist['id'],
-    {
-      name,
-      grammy,
-    }: {
-      name?: Artist['name'];
-      grammy?: Artist['grammy'];
-    },
-  ): Promise<ArtistResponse> {
+    { name, grammy }: ArtistUpdateDto,
+  ): Promise<ArtistResponseDto> {
     if (!validateUuid(artistId)) {
       throw new HttpException('Artist id is invalid', HttpStatus.BAD_REQUEST);
     }

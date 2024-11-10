@@ -10,17 +10,14 @@ import { TrackRepository } from '../repositories/track.repository';
 import { AlbumRepository } from '../repositories/album.repository';
 import { ArtistRepository } from '../repositories/artist.repository';
 
-import { type ArtistResponse, artistToArtistResponse } from './artist.service';
-import { type AlbumResponse, albumToAlbumResponse } from './album.service';
-import { type TrackResponse, trackToTrackResponse } from './track.service';
+import { artistToArtistResponse } from './artist.service';
+import { albumToAlbumResponse } from './album.service';
+import { trackToTrackResponse } from './track.service';
 
-export type FavoritesResponse = {
-  artists: ArtistResponse[];
-  albums: AlbumResponse[];
-  tracks: TrackResponse[];
-};
-
-export type FavoritesAddedResponse = { message: string };
+import {
+  FavoritesAddedResponseDto,
+  FavoritesResponseDto,
+} from '../dtos/favorites.dto';
 
 @Injectable()
 export class FavoritesService {
@@ -31,7 +28,7 @@ export class FavoritesService {
     private readonly artistRepository: ArtistRepository,
   ) {}
 
-  async getFavorites(): Promise<FavoritesResponse> {
+  async getFavorites(): Promise<FavoritesResponseDto> {
     return {
       artists: this.favoritesRepository.artists.map(artistToArtistResponse),
       albums: this.favoritesRepository.albums.map(albumToAlbumResponse),
@@ -41,7 +38,7 @@ export class FavoritesService {
 
   async addFavoriteTrack(
     trackId: Track['id'],
-  ): Promise<FavoritesAddedResponse> {
+  ): Promise<FavoritesAddedResponseDto> {
     if (!validateUuid(trackId)) {
       throw new HttpException('Track id is invalid', HttpStatus.BAD_REQUEST);
     }
@@ -92,7 +89,7 @@ export class FavoritesService {
 
   async addFavoriteAlbum(
     albumId: Album['id'],
-  ): Promise<FavoritesAddedResponse> {
+  ): Promise<FavoritesAddedResponseDto> {
     if (!validateUuid(albumId)) {
       throw new HttpException('Album id is invalid', HttpStatus.BAD_REQUEST);
     }
@@ -143,7 +140,7 @@ export class FavoritesService {
 
   async addFavoriteArtist(
     artistId: Artist['id'],
-  ): Promise<FavoritesAddedResponse> {
+  ): Promise<FavoritesAddedResponseDto> {
     if (!validateUuid(artistId)) {
       throw new HttpException('Artist id is invalid', HttpStatus.BAD_REQUEST);
     }

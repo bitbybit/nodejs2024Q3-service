@@ -5,13 +5,11 @@ import { User } from '../entities/user.entity';
 
 import { UserRepository } from '../repositories/user.repository';
 
-export type UserResponse = {
-  id: User['id'];
-  login: User['login'];
-  version: User['version'];
-  createdAt: User['createdAt'];
-  updatedAt: User['updatedAt'];
-};
+import {
+  UserCreateDto,
+  UserResponseDto,
+  UserUpdatePasswordDto,
+} from '../dtos/user.dto';
 
 export const userToUserResponse = ({
   id,
@@ -19,7 +17,7 @@ export const userToUserResponse = ({
   version,
   createdAt,
   updatedAt,
-}: User): UserResponse => {
+}: User): UserResponseDto => {
   return {
     id,
     login,
@@ -33,13 +31,13 @@ export const userToUserResponse = ({
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async getUsers(): Promise<UserResponse[]> {
+  async getUsers(): Promise<UserResponseDto[]> {
     const users = await this.userRepository.getAllUsers();
 
     return users.map(userToUserResponse);
   }
 
-  async getUser(userId: User['id']): Promise<UserResponse> {
+  async getUser(userId: User['id']): Promise<UserResponseDto> {
     if (!validateUuid(userId)) {
       throw new HttpException('User id is invalid', HttpStatus.BAD_REQUEST);
     }
@@ -59,10 +57,7 @@ export class UserService {
   async createUser({
     login,
     password,
-  }: {
-    login: User['login'];
-    password: User['password'];
-  }): Promise<UserResponse> {
+  }: UserCreateDto): Promise<UserResponseDto> {
     const hasLogin = typeof login === 'string' && login?.trim() !== '';
 
     if (!hasLogin) {
@@ -82,14 +77,8 @@ export class UserService {
 
   async updateUserPassword(
     userId: User['id'],
-    {
-      oldPassword,
-      newPassword,
-    }: {
-      oldPassword: User['password'];
-      newPassword: User['password'];
-    },
-  ): Promise<UserResponse> {
+    { oldPassword, newPassword }: UserUpdatePasswordDto,
+  ): Promise<UserResponseDto> {
     if (!validateUuid(userId)) {
       throw new HttpException('User id is invalid', HttpStatus.BAD_REQUEST);
     }
