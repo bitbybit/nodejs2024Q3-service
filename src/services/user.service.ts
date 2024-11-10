@@ -1,19 +1,27 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UserRepository } from '../repositories/user.repository';
-import { User } from '../entities/user.entity';
 import { validate as validateUuid } from 'uuid';
+import { User } from '../entities/user.entity';
+import { UserRepository } from '../repositories/user.repository';
+
+export type UserResponse = {
+  id: User['id'];
+  login: User['login'];
+  version: User['version'];
+  createdAt: User['createdAt'];
+  updatedAt: User['updatedAt'];
+};
 
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  #userToPartialUser({
+  #userToUserResponse({
     id,
     login,
     version,
     createdAt,
     updatedAt,
-  }: User): Partial<User> {
+  }: User): UserResponse {
     return {
       id,
       login,
@@ -23,13 +31,13 @@ export class UserService {
     };
   }
 
-  async getUsers(): Promise<Partial<User>[]> {
+  async getUsers(): Promise<UserResponse[]> {
     const users = await this.userRepository.getAllUsers();
 
-    return users.map(this.#userToPartialUser);
+    return users.map(this.#userToUserResponse);
   }
 
-  async getUser(userId: string): Promise<Partial<User>> {
+  async getUser(userId: User['id']): Promise<UserResponse> {
     if (!validateUuid(userId)) {
       throw new HttpException('User id is invalid', HttpStatus.BAD_REQUEST);
     }
@@ -43,16 +51,16 @@ export class UserService {
       );
     }
 
-    return this.#userToPartialUser(user);
+    return this.#userToUserResponse(user);
   }
 
   async createUser({
     login,
     password,
   }: {
-    login: string;
-    password: string;
-  }): Promise<Partial<User>> {
+    login: User['login'];
+    password: User['password'];
+  }): Promise<UserResponse> {
     const hasLogin = typeof login === 'string' && login?.trim() !== '';
 
     if (!hasLogin) {
@@ -67,34 +75,34 @@ export class UserService {
 
     const user = await this.userRepository.addUser(login, password);
 
-    return this.#userToPartialUser(user);
+    return this.#userToUserResponse(user);
   }
 
   async updateUserPassword(
-    userId: string,
+    userId: User['id'],
     {
       oldPassword,
       newPassword,
     }: {
-      oldPassword: string;
-      newPassword: string;
+      oldPassword: User['password'];
+      newPassword: User['password'];
     },
-  ): Promise<Partial<User>> {
+  ): Promise<UserResponse> {
     if (!validateUuid(userId)) {
       throw new HttpException('User id is invalid', HttpStatus.BAD_REQUEST);
     }
 
-    const hasOldPassword =
+    const isValidOldPassword =
       typeof oldPassword === 'string' && oldPassword?.trim() !== '';
 
-    if (!hasOldPassword) {
+    if (!isValidOldPassword) {
       throw new HttpException('Invalid old password', HttpStatus.BAD_REQUEST);
     }
 
-    const hasNewPassword =
+    const isValidNewPassword =
       typeof newPassword === 'string' && newPassword?.trim() !== '';
 
-    if (!hasNewPassword) {
+    if (!isValidNewPassword) {
       throw new HttpException('Invalid new password', HttpStatus.BAD_REQUEST);
     }
 
@@ -119,10 +127,10 @@ export class UserService {
       password: newPassword,
     });
 
-    return this.#userToPartialUser(updatedUser);
+    return this.#userToUserResponse(updatedUser);
   }
 
-  async removeUser(userId: string): Promise<void> {
+  async removeUser(userId: User['id']): Promise<void> {
     if (!validateUuid(userId)) {
       throw new HttpException('User id is invalid', HttpStatus.BAD_REQUEST);
     }

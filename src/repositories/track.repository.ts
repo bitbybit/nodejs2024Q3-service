@@ -12,15 +12,15 @@ export class TrackRepository {
     return this.tracks;
   }
 
-  async findTrackById(trackId: string): Promise<Track | null> {
+  async findTrackById(trackId: Track['id']): Promise<Track | null> {
     return this.tracks.find((track) => track.id === trackId) || null;
   }
 
   async addTrack(
-    name: string,
-    duration: number,
-    artistId: string | null,
-    albumId: string | null,
+    name: Track['name'],
+    duration: Track['duration'],
+    artistId: Track['artist']['id'] | null,
+    albumId: Track['album']['id'] | null,
   ): Promise<Track> {
     const track = new Track();
 
@@ -36,7 +36,7 @@ export class TrackRepository {
   }
 
   async updateTrack(
-    trackId: string,
+    trackId: Track['id'],
     data: Partial<Track>,
   ): Promise<Track | null> {
     const track = this.tracks.find((track) => track.id === trackId);
@@ -50,13 +50,13 @@ export class TrackRepository {
     return null;
   }
 
-  async removeTrack(trackId: string): Promise<void> {
+  async removeTrack(trackId: Track['id']): Promise<void> {
     await this.userRepository.removeDeletedTrackFromFavorites(trackId);
 
     this.tracks = this.tracks.filter((track) => track.id !== trackId);
   }
 
-  async removeArtistReference(artistId: string): Promise<void> {
+  async removeArtistReference(artistId: Artist['id']): Promise<void> {
     this.tracks.forEach((track) => {
       if (track.artist?.id === artistId) {
         track.artist = null;
@@ -64,7 +64,7 @@ export class TrackRepository {
     });
   }
 
-  async removeAlbumReference(albumId: string): Promise<void> {
+  async removeAlbumReference(albumId: Album['id']): Promise<void> {
     this.tracks.forEach((track) => {
       if (track.album?.id === albumId) {
         track.album = null;

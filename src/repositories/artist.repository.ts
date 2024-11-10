@@ -16,11 +16,14 @@ export class ArtistRepository {
     return this.artists;
   }
 
-  async findArtistById(artistId: string): Promise<Artist | null> {
+  async findArtistById(artistId: Artist['id']): Promise<Artist | null> {
     return this.artists.find((artist) => artist.id === artistId) || null;
   }
 
-  async addArtist(name: string, grammy: boolean): Promise<Artist> {
+  async addArtist(
+    name: Artist['name'],
+    grammy: Artist['grammy'],
+  ): Promise<Artist> {
     const artist = new Artist();
 
     artist.name = name;
@@ -34,7 +37,7 @@ export class ArtistRepository {
   }
 
   async updateArtist(
-    artistId: string,
+    artistId: Artist['id'],
     data: Partial<Artist>,
   ): Promise<Artist | null> {
     const artist = this.artists.find((artist) => artist.id === artistId);
@@ -48,7 +51,7 @@ export class ArtistRepository {
     return null;
   }
 
-  async removeArtist(artistId: string): Promise<void> {
+  async removeArtist(artistId: Artist['id']): Promise<void> {
     await this.userRepository.removeDeletedArtistFromFavorites(artistId);
     await this.trackRepository.removeArtistReference(artistId);
     await this.albumRepository.removeArtistReference(artistId);

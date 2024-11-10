@@ -10,11 +10,14 @@ export class UserRepository {
     return this.users;
   }
 
-  async findUserById(userId: string): Promise<User | null> {
+  async findUserById(userId: User['id']): Promise<User | null> {
     return this.users.find((user) => user.id === userId) || null;
   }
 
-  async addUser(login: string, password: string): Promise<User> {
+  async addUser(
+    login: User['login'],
+    password: User['password'],
+  ): Promise<User> {
     const user = new User();
 
     user.login = login;
@@ -29,7 +32,10 @@ export class UserRepository {
     return user;
   }
 
-  async updateUser(userId: string, data: Partial<User>): Promise<User | null> {
+  async updateUser(
+    userId: User['id'],
+    data: Partial<User>,
+  ): Promise<User | null> {
     const user = this.users.find((user) => user.id === userId);
 
     if (user !== undefined) {
@@ -44,11 +50,14 @@ export class UserRepository {
     return null;
   }
 
-  async removeUser(userId: string): Promise<void> {
+  async removeUser(userId: User['id']): Promise<void> {
     this.users = this.users.filter((user) => user.id !== userId);
   }
 
-  async addFavoriteArtist(userId: string, artistId: string): Promise<void> {
+  async addFavoriteArtist(
+    userId: User['id'],
+    artistId: Artist['id'],
+  ): Promise<void> {
     const user = this.users.find((user) => user.id === userId);
 
     if (
@@ -61,7 +70,10 @@ export class UserRepository {
     }
   }
 
-  async removeFavoriteArtist(userId: string, artistId: string): Promise<void> {
+  async removeFavoriteArtist(
+    userId: User['id'],
+    artistId: Artist['id'],
+  ): Promise<void> {
     const user = this.users.find((user) => user.id === userId);
 
     if (user !== undefined) {
@@ -71,7 +83,9 @@ export class UserRepository {
     }
   }
 
-  async removeDeletedArtistFromFavorites(artistId: string): Promise<void> {
+  async removeDeletedArtistFromFavorites(
+    artistId: Artist['id'],
+  ): Promise<void> {
     this.users.forEach((user) => {
       user.favoriteArtists = user.favoriteArtists.filter(
         (artist) => artist.id !== artistId,
@@ -79,7 +93,10 @@ export class UserRepository {
     });
   }
 
-  async addFavoriteAlbum(userId: string, albumId: string): Promise<void> {
+  async addFavoriteAlbum(
+    userId: User['id'],
+    albumId: Album['id'],
+  ): Promise<void> {
     const user = this.users.find((user) => user.id === userId);
 
     if (
@@ -91,7 +108,10 @@ export class UserRepository {
     }
   }
 
-  async removeFavoriteAlbum(userId: string, albumId: string): Promise<void> {
+  async removeFavoriteAlbum(
+    userId: User['id'],
+    albumId: Album['id'],
+  ): Promise<void> {
     const user = this.users.find((user) => user.id === userId);
 
     if (user !== undefined) {
@@ -101,7 +121,7 @@ export class UserRepository {
     }
   }
 
-  async removeDeletedAlbumFromFavorites(albumId: string): Promise<void> {
+  async removeDeletedAlbumFromFavorites(albumId: Album['id']): Promise<void> {
     this.users.forEach((user) => {
       user.favoriteAlbums = user.favoriteAlbums.filter(
         (album) => album.id !== albumId,
@@ -109,7 +129,10 @@ export class UserRepository {
     });
   }
 
-  async addFavoriteTrack(userId: string, trackId: string): Promise<void> {
+  async addFavoriteTrack(
+    userId: User['id'],
+    trackId: Track['id'],
+  ): Promise<void> {
     const user = this.users.find((user) => user.id === userId);
 
     if (
@@ -121,7 +144,10 @@ export class UserRepository {
     }
   }
 
-  async removeFavoriteTrack(userId: string, trackId: string): Promise<void> {
+  async removeFavoriteTrack(
+    userId: User['id'],
+    trackId: Track['id'],
+  ): Promise<void> {
     const user = this.users.find((user) => user.id === userId);
 
     if (user !== undefined) {
@@ -131,7 +157,7 @@ export class UserRepository {
     }
   }
 
-  async removeDeletedTrackFromFavorites(trackId: string): Promise<void> {
+  async removeDeletedTrackFromFavorites(trackId: Track['id']): Promise<void> {
     this.users.forEach((user) => {
       user.favoriteTracks = user.favoriteTracks.filter(
         (track) => track.id !== trackId,
