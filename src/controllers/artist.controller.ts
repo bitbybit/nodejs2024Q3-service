@@ -9,7 +9,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Artist } from '../entities/artist.entity';
 
@@ -22,7 +22,7 @@ import {
 } from '../dtos/artist.dto';
 
 @Controller('artist')
-@ApiTags('Artist')
+@ApiTags('Artists')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
@@ -31,6 +31,7 @@ export class ArtistController {
   @ApiOperation({ summary: 'Get all artists' })
   @ApiResponse({
     status: HttpStatus.OK,
+    description: 'Successful operation',
     type: [ArtistResponseDto],
   })
   async getArtists(): Promise<ArtistResponseDto[]> {
@@ -40,9 +41,21 @@ export class ArtistController {
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get single artist by id' })
+  @ApiParam({
+    name: 'id',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
+    description: 'Successful operation',
     type: ArtistResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad request. artistId is invalid (not uuid)',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Artist was not found.',
   })
   async getArtist(@Param('id') id: Artist['id']): Promise<ArtistResponseDto> {
     return await this.artistService.getArtist(id);
@@ -53,7 +66,12 @@ export class ArtistController {
   @ApiOperation({ summary: 'Add new artist' })
   @ApiResponse({
     status: HttpStatus.CREATED,
+    description: 'Successful operation',
     type: ArtistResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad request. body does not contain required fields',
   })
   async createArtist(
     @Body() payload: ArtistCreateDto,
@@ -64,9 +82,21 @@ export class ArtistController {
   @Put('/:id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update artist information' })
+  @ApiParam({
+    name: 'id',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
+    description: 'The artist has been updated.',
     type: ArtistResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad request. artistId is invalid (not uuid)',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Artist was not found.',
   })
   async updateArtist(
     @Param('id') id: Artist['id'],
@@ -79,8 +109,20 @@ export class ArtistController {
   @Delete('/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete artist' })
+  @ApiParam({
+    name: 'id',
+  })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
+    description: 'Deleted successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Bad request. artistId is invalid (not uuid)',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Artist was not found.',
   })
   async removeArtist(@Param('id') id: Artist['id']): Promise<void> {
     await this.artistService.removeArtist(id);

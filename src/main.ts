@@ -12,9 +12,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const swagger = new DocumentBuilder()
-    .setTitle('API')
+    .setTitle('Home music library')
     .setDescription('API documentation')
-    .setVersion('1.0')
+    .setVersion('1.0.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, swagger);
