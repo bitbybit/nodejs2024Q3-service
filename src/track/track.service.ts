@@ -9,11 +9,7 @@ import { TrackRepository } from '../repositories/track.repository';
 import { ArtistRepository } from '../repositories/artist.repository';
 import { AlbumRepository } from '../repositories/album.repository';
 
-import {
-  TrackCreateDto,
-  TrackResponseDto,
-  TrackUpdateDto,
-} from '../dtos/track.dto';
+import { TrackCreateDto, TrackResponseDto, TrackUpdateDto } from './track.dto';
 
 export const trackToTrackResponse = ({
   id,

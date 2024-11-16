@@ -10,14 +10,14 @@ import { TrackRepository } from '../repositories/track.repository';
 import { AlbumRepository } from '../repositories/album.repository';
 import { ArtistRepository } from '../repositories/artist.repository';
 
-import { artistToArtistResponse } from './artist.service';
-import { albumToAlbumResponse } from './album.service';
-import { trackToTrackResponse } from './track.service';
+import { artistToArtistResponse } from '../artist/artist.service';
+import { albumToAlbumResponse } from '../album/album.service';
+import { trackToTrackResponse } from '../track/track.service';
 
 import {
   FavoritesAddedResponseDto,
   FavoritesResponseDto,
-} from '../dtos/favorites.dto';
+} from './favorites.dto';
 
 @Injectable()
 export class FavoritesService {

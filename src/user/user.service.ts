@@ -9,7 +9,7 @@ import {
   UserCreateDto,
   UserResponseDto,
   UserUpdatePasswordDto,
-} from '../dtos/user.dto';
+} from './user.dto';
 
 export const userToUserResponse = ({
   id,
