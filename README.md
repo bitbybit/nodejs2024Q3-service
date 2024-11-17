@@ -6,13 +6,7 @@
 git clone git@github.com:bitbybit/nodejs2024Q3-service.git
 ```
 
-## Installing NPM modules
-
-```
-npm ci
-```
-
-## Set ENV variable `PORT`
+## Set ENV variables
 
 ```
 cp .env.example .env
@@ -21,13 +15,19 @@ cp .env.example .env
 ## Running application
 
 ```
-npm run migration:run
-npm start
+docker-compose up -d
+docker-compose exec app npm run migration:run
 ```
 
 After starting the app on port (`4000` as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
+
+## Vulnerabilities scanning
+
+```
+docker-compose exec app npm audit
+```
 
 ## Testing
 

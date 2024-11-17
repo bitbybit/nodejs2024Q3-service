@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { HTTP_PORT } from './envs';
+import { PORT } from './envs';
 import { AppDataSource } from './data-source';
 import { type AppConfig, AppModule } from './app.module';
 
@@ -22,7 +22,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('doc', app, document);
 
-  await app.listen(HTTP_PORT);
+  await app.listen(PORT);
 }
 
 bootstrap();
