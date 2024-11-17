@@ -1,5 +1,5 @@
 import { type DynamicModule, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import { AlbumModule } from './album/album.module';
 import { ArtistModule } from './artist/artist.module';
@@ -8,35 +8,19 @@ import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
 
 export type AppConfig = {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
+  dataSourceOptions: TypeOrmModuleOptions;
 };
 
 @Module({})
 export class AppModule {
-  static forRoot({
-    host,
-    port,
-    username,
-    password,
-    database,
-  }: AppConfig): DynamicModule {
+  static forRoot({ dataSourceOptions }: AppConfig): DynamicModule {
     return {
       module: AppModule,
       imports: [
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          host,
-          port,
-          username,
-          password,
-          database,
-          entities: [__dirname + '/entities/*.entity.{ts,js}'],
-          synchronize: true,
-          logging: true,
+        TypeOrmModule.forRootAsync({
+          useFactory: async () => ({
+            ...dataSourceOptions,
+          }),
         }),
 
         AlbumModule,

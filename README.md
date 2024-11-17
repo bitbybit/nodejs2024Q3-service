@@ -21,6 +21,7 @@ cp .env.example .env
 ## Running application
 
 ```
+npm run migration:run
 npm start
 ```
 
