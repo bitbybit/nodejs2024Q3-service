@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { type DynamicModule, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AlbumModule } from './album/album.module';
 import { ArtistModule } from './artist/artist.module';
@@ -6,13 +7,44 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { TrackModule } from './track/track.module';
 import { UserModule } from './user/user.module';
 
-@Module({
-  imports: [
-    AlbumModule,
-    ArtistModule,
-    FavoritesModule,
-    TrackModule,
-    UserModule,
-  ],
-})
-export class AppModule {}
+export type AppConfig = {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+};
+
+@Module({})
+export class AppModule {
+  static forRoot({
+    host,
+    port,
+    username,
+    password,
+    database,
+  }: AppConfig): DynamicModule {
+    return {
+      module: AppModule,
+      imports: [
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host,
+          port,
+          username,
+          password,
+          database,
+          entities: [__dirname + '/entities/*.entity.{ts,js}'],
+          synchronize: true,
+          logging: true,
+        }),
+
+        AlbumModule,
+        ArtistModule,
+        FavoritesModule,
+        TrackModule,
+        UserModule,
+      ],
+    };
+  }
+}

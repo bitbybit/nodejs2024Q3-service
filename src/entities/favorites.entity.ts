@@ -1,21 +1,23 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
+import { Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Artist } from './artist.entity';
 import { Album } from './album.entity';
+import { Artist } from './artist.entity';
 import { Track } from './track.entity';
 
 @Entity()
 export class Favorites {
-  @PrimaryGeneratedColumn('uuid')
-  id: string = uuidv4();
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column('simple-array')
+  @ManyToMany(() => Artist, { cascade: true })
+  @JoinTable()
   artists: Artist[];
 
-  @Column('simple-array')
+  @ManyToMany(() => Album, { cascade: true })
+  @JoinTable()
   albums: Album[];
 
-  @Column('simple-array')
+  @ManyToMany(() => Track, { cascade: true })
+  @JoinTable()
   tracks: Track[];
 }

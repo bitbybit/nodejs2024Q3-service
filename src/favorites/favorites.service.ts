@@ -29,10 +29,14 @@ export class FavoritesService {
   ) {}
 
   async getFavorites(): Promise<FavoritesResponseDto> {
+    const artists = await this.favoritesRepository.getArtists();
+    const albums = await this.favoritesRepository.getAlbums();
+    const tracks = await this.favoritesRepository.getTracks();
+
     return {
-      artists: this.favoritesRepository.artists.map(artistToArtistResponse),
-      albums: this.favoritesRepository.albums.map(albumToAlbumResponse),
-      tracks: this.favoritesRepository.tracks.map(trackToTrackResponse),
+      artists: artists.map(artistToArtistResponse),
+      albums: albums.map(albumToAlbumResponse),
+      tracks: tracks.map(trackToTrackResponse),
     };
   }
 
