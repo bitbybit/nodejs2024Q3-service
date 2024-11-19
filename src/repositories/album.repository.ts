@@ -1,29 +1,36 @@
+import { DataSource, Repository } from 'typeorm';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import { Album } from '../entities/album.entity';
 import { Artist } from '../entities/artist.entity';
 
-import { TrackRepository } from './track.repository';
+import { ArtistRepository } from './artist.repository';
 import { FavoritesRepository } from './favorites.repository';
+import { TrackRepository } from './track.repository';
 
 @Injectable()
-export class AlbumRepository {
-  private albums: Album[] = [];
-
+export class AlbumRepository extends Repository<Album> {
   constructor(
-    @Inject(forwardRef(() => TrackRepository))
-    private readonly trackRepository: TrackRepository,
+    private readonly dataSource: DataSource,
+
+    @Inject(forwardRef(() => ArtistRepository))
+    private readonly artistRepository: ArtistRepository,
 
     @Inject(forwardRef(() => FavoritesRepository))
     private readonly favoritesRepository: FavoritesRepository,
-  ) {}
+
+    @Inject(forwardRef(() => TrackRepository))
+    private readonly trackRepository: TrackRepository,
+  ) {
+    super(Album, dataSource.createEntityManager());
+  }
 
   async getAllAlbums(): Promise<Album[]> {
-    return this.albums;
+    return this.find({ relations: ['artist'] });
   }
 
   async findAlbumById(id: Album['id']): Promise<Album | null> {
-    return this.albums.find((album) => album.id === id) || null;
+    return this.findOne({ where: { id }, relations: ['artist'] });
   }
 
   async addAlbum(
@@ -31,45 +38,43 @@ export class AlbumRepository {
     year: Album['year'],
     artistId: Artist['id'],
   ): Promise<Album> {
-    const album = new Album();
+    const artist =
+      artistId !== null
+        ? await this.artistRepository.findArtistById(artistId)
+        : null;
 
-    album.name = name;
-    album.year = year;
-    album.artist = artistId ? ({ id: artistId } as Artist) : null;
-    album.tracks = [];
+    const album = this.create({ name, year, artist });
 
-    this.albums.push(album);
-
-    return album;
+    return this.save(album);
   }
 
   async updateAlbum(
     albumId: Album['id'],
     data: Partial<Album>,
   ): Promise<Album | null> {
-    const album = this.albums.find((album) => album.id === albumId);
+    const album = await this.findOneBy({ id: albumId });
 
-    if (album !== undefined) {
-      Object.assign(album, data);
-
-      return album;
+    if (album === null) {
+      return null;
     }
 
-    return null;
+    Object.assign(album, data);
+
+    return this.save(album);
   }
 
   async removeAlbum(albumId: Album['id']): Promise<void> {
     await this.favoritesRepository.removeDeletedAlbumFromFavorites(albumId);
     await this.trackRepository.removeAlbumReference(albumId);
 
-    this.albums = this.albums.filter((album) => album.id !== albumId);
+    await this.delete(albumId);
   }
 
   async removeArtistReference(artistId: Artist['id']): Promise<void> {
-    this.albums.forEach((album) => {
-      if (album.artist?.id === artistId) {
-        album.artist = null;
-      }
-    });
+    await this.createQueryBuilder()
+      .update(Album)
+      .set({ artist: null })
+      .where('artistId = :artistId', { artistId })
+      .execute();
   }
 }

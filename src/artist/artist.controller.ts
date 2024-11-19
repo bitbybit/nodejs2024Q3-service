@@ -13,13 +13,13 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Artist } from '../entities/artist.entity';
 
-import { ArtistService } from '../services/artist.service';
+import { ArtistService } from './artist.service';
 
 import {
   ArtistCreateDto,
   ArtistResponseDto,
   ArtistUpdateDto,
-} from '../dtos/artist.dto';
+} from './artist.dto';
 
 @Controller('artist')
 @ApiTags('Artists')

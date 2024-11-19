@@ -13,13 +13,9 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Track } from '../entities/track.entity';
 
-import { TrackService } from '../services/track.service';
+import { TrackService } from './track.service';
 
-import {
-  TrackCreateDto,
-  TrackResponseDto,
-  TrackUpdateDto,
-} from '../dtos/track.dto';
+import { TrackCreateDto, TrackResponseDto, TrackUpdateDto } from './track.dto';
 
 @Controller('track')
 @ApiTags('Tracks')

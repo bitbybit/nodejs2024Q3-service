@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
@@ -21,9 +15,25 @@ export class User {
   @Column({ default: 1 })
   version: number;
 
-  @CreateDateColumn()
-  createdAt: number = new Date().getTime();
+  @Column({ type: 'bigint' })
+  _createdAt: number = new Date().getTime();
 
-  @UpdateDateColumn()
-  updatedAt: number = new Date().getTime();
+  @Column({ type: 'bigint' })
+  _updatedAt: number = new Date().getTime();
+
+  get createdAt(): number {
+    return Number(this._createdAt);
+  }
+
+  set createdAt(value: string | number) {
+    this._createdAt = Number(value);
+  }
+
+  get updatedAt(): number {
+    return Number(this._updatedAt);
+  }
+
+  set updatedAt(value: string | number) {
+    this._updatedAt = Number(value);
+  }
 }

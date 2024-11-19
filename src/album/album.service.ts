@@ -7,11 +7,7 @@ import { Artist } from '../entities/artist.entity';
 import { AlbumRepository } from '../repositories/album.repository';
 import { ArtistRepository } from '../repositories/artist.repository';
 
-import {
-  AlbumCreateDto,
-  AlbumResponseDto,
-  AlbumUpdateDto,
-} from '../dtos/album.dto';
+import { AlbumCreateDto, AlbumResponseDto, AlbumUpdateDto } from './album.dto';
 
 export const albumToAlbumResponse = ({
   id,

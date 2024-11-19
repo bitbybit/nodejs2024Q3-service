@@ -13,13 +13,9 @@ import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { Album } from '../entities/album.entity';
 
-import { AlbumService } from '../services/album.service';
+import { AlbumService } from './album.service';
 
-import {
-  AlbumCreateDto,
-  AlbumResponseDto,
-  AlbumUpdateDto,
-} from '../dtos/album.dto';
+import { AlbumCreateDto, AlbumResponseDto, AlbumUpdateDto } from './album.dto';
 
 @Controller('album')
 @ApiTags('Albums')

@@ -13,12 +13,12 @@ import { Track } from '../entities/track.entity';
 import { Album } from '../entities/album.entity';
 import { Artist } from '../entities/artist.entity';
 
-import { FavoritesService } from '../services/favorites.service';
+import { FavoritesService } from './favorites.service';
 
 import {
   FavoritesAddedResponseDto,
   FavoritesResponseDto,
-} from '../dtos/favorites.dto';
+} from './favorites.dto';
 
 @Controller('favs')
 @ApiTags('Favorites')

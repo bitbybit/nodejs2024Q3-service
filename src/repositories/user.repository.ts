@@ -1,53 +1,54 @@
+import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
 import { User } from '../entities/user.entity';
 
 @Injectable()
-export class UserRepository {
-  private users: User[] = [];
+export class UserRepository extends Repository<User> {
+  constructor(private readonly dataSource: DataSource) {
+    super(User, dataSource.createEntityManager());
+  }
 
   async getAllUsers(): Promise<User[]> {
-    return this.users;
+    return await this.find();
   }
 
   async findUserById(userId: User['id']): Promise<User | null> {
-    return this.users.find((user) => user.id === userId) || null;
+    return await this.findOne({ where: { id: userId } });
   }
 
   async addUser(
     login: User['login'],
     password: User['password'],
   ): Promise<User> {
-    const user = new User();
+    const user = this.create({
+      login,
+      password,
+      version: 1,
+    });
 
-    user.login = login;
-    user.password = password;
-    user.version = 1;
-
-    this.users.push(user);
-
-    return user;
+    return await this.save(user);
   }
 
   async updateUser(
     userId: User['id'],
     data: Partial<User>,
   ): Promise<User | null> {
-    const user = this.users.find((user) => user.id === userId);
+    const user = await this.findOne({ where: { id: userId } });
 
-    if (user !== undefined) {
-      Object.assign(user, data);
-
-      user.version += 1;
-      user.updatedAt = new Date().getTime();
-
-      return user;
+    if (user === null) {
+      return null;
     }
 
-    return null;
+    Object.assign(user, data);
+
+    user.version += 1;
+    user.updatedAt = new Date().getTime();
+
+    return await this.save(user);
   }
 
   async removeUser(userId: User['id']): Promise<void> {
-    this.users = this.users.filter((user) => user.id !== userId);
+    await this.delete({ id: userId });
   }
 }
