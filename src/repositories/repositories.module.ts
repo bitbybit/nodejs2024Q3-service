@@ -1,6 +1,8 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 
+import { AuthModule } from '../auth/auth.module';
+
 import { Album } from '../entities/album.entity';
 import { Artist } from '../entities/artist.entity';
 import { Favorites } from '../entities/favorites.entity';
@@ -14,7 +16,10 @@ import { TrackRepository } from './track.repository';
 import { UserRepository } from './user.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Album, Artist, Favorites, Track, User])],
+  imports: [
+    AuthModule,
+    TypeOrmModule.forFeature([Album, Artist, Favorites, Track, User]),
+  ],
 
   providers: [
     AlbumRepository,

@@ -1,13 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-import { PORT } from './envs';
+import { CRYPT_SALT, JWT_SECRET_KEY, TOKEN_EXPIRE_TIME, PORT } from './envs';
 import { AppDataSource } from './data-source';
+
 import { type AppConfig, AppModule } from './app.module';
 
 async function bootstrap() {
   const appConfig: AppConfig = {
+    cryptSalt: CRYPT_SALT,
     dataSourceOptions: AppDataSource.options,
+    jwtSecretKey: JWT_SECRET_KEY,
+    tokenExpireTime: TOKEN_EXPIRE_TIME,
   };
 
   const app = await NestFactory.create(AppModule.forRoot(appConfig));

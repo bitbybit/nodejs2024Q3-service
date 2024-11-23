@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
 
+import { AuthService } from '../auth/auth.service';
+
 import { User } from '../entities/user.entity';
 
 import { UserRepository } from '../repositories/user.repository';
@@ -29,7 +31,10 @@ export const userToUserResponse = ({
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   async getUsers(): Promise<UserResponseDto[]> {
     const users = await this.userRepository.getAllUsers();
@@ -106,7 +111,12 @@ export class UserService {
       );
     }
 
-    if (user.password !== oldPassword) {
+    const isCorrectOldPassword = await this.authService.verifyPassword(
+      oldPassword,
+      user.password,
+    );
+
+    if (!isCorrectOldPassword) {
       throw new HttpException(
         'Old password is incorrect',
         HttpStatus.FORBIDDEN,
