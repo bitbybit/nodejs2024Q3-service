@@ -1,4 +1,5 @@
 import { config as setEnvVariables } from 'dotenv';
+import { type LogLevel } from '@nestjs/common/services/logger.service';
 
 setEnvVariables();
 
@@ -17,3 +18,8 @@ export const JWT_SECRET_REFRESH_KEY =
 export const TOKEN_EXPIRE_TIME = process.env.TOKEN_EXPIRE_TIME || '1h';
 export const TOKEN_REFRESH_EXPIRE_TIME =
   process.env.TOKEN_REFRESH_EXPIRE_TIME || '24h';
+
+export const LOG_LEVEL: LogLevel = (process.env.LOG_LEVEL as LogLevel) || 'log';
+export const LOG_FILE_SIZE_KB = Number(process.env.LOG_FILE_SIZE_KB) || 1024;
+export const LOG_DIR = process.env.LOG_DIR || './logs';
+export const LOG_FILENAME = process.env.LOG_FILENAME || 'app.log';

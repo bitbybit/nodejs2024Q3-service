@@ -8,23 +8,23 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { RefreshGuard } from '../auth/refresh.guard';
+import { RefreshGuard } from '../authorization/refresh.guard';
 
-import { LoginService } from './login.service';
+import { AuthenticationService } from './authentication.service';
 
 import {
-  LoginDto,
-  LoginResponseDto,
-  LoginSignupDto,
-  LoginSignupResponseDto,
-  RefreshTokenDto,
-  RefreshTokenResponseDto,
-} from './login.dto';
+  AuthenticationLoginDto,
+  AuthenticationLoginResponseDto,
+  AuthenticationSignupDto,
+  AuthenticationSignupResponseDto,
+  AuthenticationRefreshTokenDto,
+  AuthenticationRefreshTokenResponseDto,
+} from './authentication.dto';
 
 @Controller('auth')
 @ApiTags('Authentication')
-export class LoginController {
-  constructor(private readonly loginService: LoginService) {}
+export class AuthenticationController {
+  constructor(private readonly authenticationService: AuthenticationService) {}
 
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
@@ -32,7 +32,7 @@ export class LoginController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Successful signup',
-    type: LoginSignupResponseDto,
+    type: AuthenticationSignupResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -43,9 +43,9 @@ export class LoginController {
     description: 'Conflict. Login already exists',
   })
   async signup(
-    @Body() payload: LoginSignupDto,
-  ): Promise<LoginSignupResponseDto> {
-    return await this.loginService.signup(payload);
+    @Body() payload: AuthenticationSignupDto,
+  ): Promise<AuthenticationSignupResponseDto> {
+    return await this.authenticationService.signup(payload);
   }
 
   @Post('login')
@@ -54,7 +54,7 @@ export class LoginController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successful login',
-    type: LoginResponseDto,
+    type: AuthenticationLoginResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -64,8 +64,10 @@ export class LoginController {
     status: HttpStatus.FORBIDDEN,
     description: 'Incorrect login or password',
   })
-  async login(@Body() payload: LoginDto): Promise<LoginResponseDto> {
-    return await this.loginService.login(payload);
+  async login(
+    @Body() payload: AuthenticationLoginDto,
+  ): Promise<AuthenticationLoginResponseDto> {
+    return await this.authenticationService.login(payload);
   }
 
   @Post('refresh')
@@ -75,7 +77,7 @@ export class LoginController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Success',
-    type: RefreshTokenResponseDto,
+    type: AuthenticationRefreshTokenResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -86,8 +88,8 @@ export class LoginController {
     description: 'Refresh token is invalid or expired',
   })
   async refreshToken(
-    @Body() payload: RefreshTokenDto,
-  ): Promise<RefreshTokenResponseDto> {
-    return await this.loginService.refreshToken(payload);
+    @Body() payload: AuthenticationRefreshTokenDto,
+  ): Promise<AuthenticationRefreshTokenResponseDto> {
+    return await this.authenticationService.refreshToken(payload);
   }
 }

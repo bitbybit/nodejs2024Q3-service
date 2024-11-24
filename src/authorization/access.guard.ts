@@ -6,11 +6,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-import { AuthService } from './auth.service';
+import { AuthorizationService } from './authorization.service';
 
 @Injectable()
 export class AccessGuard implements CanActivate {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authorizationService: AuthorizationService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -21,7 +21,7 @@ export class AccessGuard implements CanActivate {
     }
 
     try {
-      await this.authService.verifyAccessToken(token);
+      await this.authorizationService.verifyAccessToken(token);
 
       return true;
     } catch (error) {

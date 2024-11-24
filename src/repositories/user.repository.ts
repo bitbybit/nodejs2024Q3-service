@@ -1,7 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
-import { AuthService } from '../auth/auth.service';
+import { AuthorizationService } from '../authorization/authorization.service';
 
 import { User } from '../entities/user.entity';
 
@@ -9,7 +9,7 @@ import { User } from '../entities/user.entity';
 export class UserRepository extends Repository<User> {
   constructor(
     private readonly dataSource: DataSource,
-    private readonly authService: AuthService,
+    private readonly authorizationService: AuthorizationService,
   ) {
     super(User, dataSource.createEntityManager());
   }
@@ -38,7 +38,7 @@ export class UserRepository extends Repository<User> {
   ): Promise<User> {
     const user = this.create({
       login,
-      password: await this.authService.hashPassword(password),
+      password: await this.authorizationService.hashPassword(password),
       version: 1,
       refreshToken: '',
     });
@@ -57,7 +57,9 @@ export class UserRepository extends Repository<User> {
     }
 
     if (data.password !== undefined) {
-      data.password = await this.authService.hashPassword(data.password);
+      data.password = await this.authorizationService.hashPassword(
+        data.password,
+      );
     }
 
     Object.assign(user, data);

@@ -6,13 +6,13 @@ import { type AppConfig } from '../app.module';
 import { AccessGuard } from './access.guard';
 import { RefreshGuard } from './refresh.guard';
 
-import { AuthService } from './auth.service';
+import { AuthorizationService } from './authorization.service';
 
 @Module({
   providers: [
     AccessGuard,
     RefreshGuard,
-    AuthService,
+    AuthorizationService,
 
     {
       provide: 'ACCESS_TOKEN_SERVICE',
@@ -34,6 +34,6 @@ import { AuthService } from './auth.service';
       inject: ['APP_CONFIG'],
     },
   ],
-  exports: [AccessGuard, RefreshGuard, AuthService],
+  exports: [AccessGuard, RefreshGuard, AuthorizationService],
 })
-export class AuthModule {}
+export class AuthorizationModule {}

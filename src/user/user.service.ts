@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
 
-import { AuthService } from '../auth/auth.service';
+import { AuthorizationService } from '../authorization/authorization.service';
 
 import { User } from '../entities/user.entity';
 
@@ -37,7 +37,7 @@ export const userToUserResponse = ({
 @Injectable()
 export class UserService {
   constructor(
-    private readonly authService: AuthService,
+    private readonly authorizationService: AuthorizationService,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -110,7 +110,7 @@ export class UserService {
       throw new NotFoundException(`User with id ${userId} is not found`);
     }
 
-    const isCorrectOldPassword = await this.authService.verifyPassword(
+    const isCorrectOldPassword = await this.authorizationService.verifyPassword(
       oldPassword,
       user.password,
     );

@@ -5,30 +5,30 @@ import {
   Injectable,
 } from '@nestjs/common';
 
-import { AuthService } from '../auth/auth.service';
+import { AuthorizationService } from '../authorization/authorization.service';
 
 import { UserRepository } from '../repositories/user.repository';
 
 import {
-  LoginDto,
-  LoginResponseDto,
-  LoginSignupDto,
-  LoginSignupResponseDto,
-  RefreshTokenDto,
-  RefreshTokenResponseDto,
-} from './login.dto';
+  AuthenticationLoginDto,
+  AuthenticationLoginResponseDto,
+  AuthenticationSignupDto,
+  AuthenticationSignupResponseDto,
+  AuthenticationRefreshTokenDto,
+  AuthenticationRefreshTokenResponseDto,
+} from './authentication.dto';
 
 @Injectable()
-export class LoginService {
+export class AuthenticationService {
   constructor(
-    private readonly authService: AuthService,
+    private readonly authorizationService: AuthorizationService,
     private readonly userRepository: UserRepository,
   ) {}
 
   async signup({
     login,
     password,
-  }: LoginSignupDto): Promise<LoginSignupResponseDto> {
+  }: AuthenticationSignupDto): Promise<AuthenticationSignupResponseDto> {
     const hasLogin = typeof login === 'string' && login?.trim() !== '';
 
     if (!hasLogin) {
@@ -55,7 +55,10 @@ export class LoginService {
     };
   }
 
-  async login({ login, password }: LoginDto): Promise<LoginResponseDto> {
+  async login({
+    login,
+    password,
+  }: AuthenticationLoginDto): Promise<AuthenticationLoginResponseDto> {
     const hasLogin = typeof login === 'string' && login?.trim() !== '';
 
     if (!hasLogin) {
@@ -74,7 +77,7 @@ export class LoginService {
       throw new ForbiddenException('No user with such login');
     }
 
-    const isCorrectPassword = await this.authService.verifyPassword(
+    const isCorrectPassword = await this.authorizationService.verifyPassword(
       password,
       user.password,
     );
@@ -83,12 +86,12 @@ export class LoginService {
       throw new ForbiddenException('Password does not match');
     }
 
-    const accessToken = await this.authService.generateAccessToken(
+    const accessToken = await this.authorizationService.generateAccessToken(
       user.login,
       user.id,
     );
 
-    const refreshToken = await this.authService.generateRefreshToken(
+    const refreshToken = await this.authorizationService.generateRefreshToken(
       user.login,
       user.id,
     );
@@ -105,22 +108,20 @@ export class LoginService {
 
   async refreshToken({
     refreshToken,
-  }: RefreshTokenDto): Promise<RefreshTokenResponseDto> {
+  }: AuthenticationRefreshTokenDto): Promise<AuthenticationRefreshTokenResponseDto> {
     const user = await this.userRepository.findUserByRefreshToken(refreshToken);
 
     if (user === null) {
       throw new ForbiddenException('Refresh token is invalid');
     }
 
-    const newAccessToken = await this.authService.generateAccessToken(
+    const newAccessToken = await this.authorizationService.generateAccessToken(
       user.login,
       user.id,
     );
 
-    const newRefreshToken = await this.authService.generateRefreshToken(
-      user.login,
-      user.id,
-    );
+    const newRefreshToken =
+      await this.authorizationService.generateRefreshToken(user.login, user.id);
 
     await this.userRepository.updateUser(user.id, {
       refreshToken: newRefreshToken,

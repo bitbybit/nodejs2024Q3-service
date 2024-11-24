@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 import { User } from '../entities/user.entity';
 
-export class LoginSignupDto {
+export class AuthenticationSignupDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String })
@@ -15,7 +15,7 @@ export class LoginSignupDto {
   password: User['password'];
 }
 
-export class LoginDto {
+export class AuthenticationLoginDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String })
@@ -27,14 +27,14 @@ export class LoginDto {
   password: User['password'];
 }
 
-export class RefreshTokenDto {
+export class AuthenticationRefreshTokenDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String })
   refreshToken: string;
 }
 
-export class LoginSignupResponseDto {
+export class AuthenticationSignupResponseDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String })
@@ -46,7 +46,7 @@ export class LoginSignupResponseDto {
   login: User['login'];
 }
 
-export class LoginResponseDto {
+export class AuthenticationLoginResponseDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String })
@@ -58,7 +58,7 @@ export class LoginResponseDto {
   refreshToken: string;
 }
 
-export class RefreshTokenResponseDto {
+export class AuthenticationRefreshTokenResponseDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String })

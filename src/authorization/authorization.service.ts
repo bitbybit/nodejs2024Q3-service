@@ -7,7 +7,7 @@ import { type AppConfig } from '../app.module';
 import { User } from '../entities/user.entity';
 
 @Injectable()
-export class AuthService {
+export class AuthorizationService {
   constructor(
     @Inject('APP_CONFIG')
     private readonly appConfig: AppConfig,

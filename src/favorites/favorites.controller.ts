@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { AccessGuard } from '../auth/access.guard';
+import { AccessGuard } from '../authorization/access.guard';
 
 import { Track } from '../entities/track.entity';
 import { Album } from '../entities/album.entity';

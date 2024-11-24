@@ -12,6 +12,14 @@ git clone git@github.com:bitbybit/nodejs2024Q3-service.git
 cp .env.example .env
 ```
 
+### Log level
+
+```
+LOG_LEVEL=debug
+```
+
+Possible values: `log`, `error`, `warn`, `debug`, `verbose`
+
 ## Running application
 
 ```
