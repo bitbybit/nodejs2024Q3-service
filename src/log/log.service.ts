@@ -22,6 +22,7 @@ export class LogService implements LoggerService {
   private activeLogLevels: LogLevel[] = [];
 
   private readonly logFilePath: string;
+  private readonly logErrorFilePath: string;
 
   constructor(
     @Inject('APP_CONFIG')
@@ -30,6 +31,11 @@ export class LogService implements LoggerService {
     this.logFilePath = path.join(
       this.appConfig.logDir,
       this.appConfig.logFilename,
+    );
+
+    this.logErrorFilePath = path.join(
+      this.appConfig.logDir,
+      this.appConfig.logErrorFilename,
     );
 
     this.createDirectory().then(() => {
@@ -82,17 +88,22 @@ export class LogService implements LoggerService {
     console.log(formattedMessage);
 
     await appendFile(this.logFilePath, `${formattedMessage}\n`);
-    await this.rotateLogFile();
+    await this.rotateLogFile(this.logFilePath);
+
+    if (level === 'error') {
+      await appendFile(this.logErrorFilePath, `${formattedMessage}\n`);
+      await this.rotateLogFile(this.logErrorFilePath);
+    }
   }
 
-  private async rotateLogFile(): Promise<void> {
+  private async rotateLogFile(filePath: string): Promise<void> {
     try {
-      const stats = await stat(this.logFilePath);
+      const stats = await stat(filePath);
 
       if (stats.size / 1024 >= this.appConfig.logFileSizeKb) {
-        const rotatedFilePath = `${this.logFilePath}.${Date.now()}`;
+        const rotatedFilePath = `${filePath}.${Date.now()}`;
 
-        await rename(this.logFilePath, rotatedFilePath);
+        await rename(filePath, rotatedFilePath);
       }
     } catch (e) {
       if (e.code !== 'ENOENT') {

@@ -23,3 +23,4 @@ export const LOG_LEVEL: LogLevel = (process.env.LOG_LEVEL as LogLevel) || 'log';
 export const LOG_FILE_SIZE_KB = Number(process.env.LOG_FILE_SIZE_KB) || 1024;
 export const LOG_DIR = process.env.LOG_DIR || './logs';
 export const LOG_FILENAME = process.env.LOG_FILENAME || 'app.log';
+export const LOG_ERROR_FILENAME = process.env.LOG_ERROR_FILENAME || 'error.log';

@@ -25,6 +25,7 @@ export type AppConfig = {
   logDir: string;
   logFileSizeKb: number;
   logFilename: string;
+  logErrorFilename: string;
   logLevel: LogLevel;
   tokenExpireTime: string;
   tokenRefreshExpireTime: string;
