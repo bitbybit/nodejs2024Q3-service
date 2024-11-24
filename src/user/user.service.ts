@@ -1,5 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
+
+import { AuthorizationService } from '../authorization/authorization.service';
 
 import { User } from '../entities/user.entity';
 
@@ -29,7 +36,10 @@ export const userToUserResponse = ({
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly authorizationService: AuthorizationService,
+    private readonly userRepository: UserRepository,
+  ) {}
 
   async getUsers(): Promise<UserResponseDto[]> {
     const users = await this.userRepository.getAllUsers();
@@ -39,16 +49,13 @@ export class UserService {
 
   async getUser(userId: User['id']): Promise<UserResponseDto> {
     if (!validateUuid(userId)) {
-      throw new HttpException('User id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('User id is invalid');
     }
 
     const user = await this.userRepository.findUserById(userId);
 
     if (user === null) {
-      throw new HttpException(
-        `User with id ${userId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`User with id ${userId} is not found`);
     }
 
     return userToUserResponse(user);
@@ -61,13 +68,13 @@ export class UserService {
     const hasLogin = typeof login === 'string' && login?.trim() !== '';
 
     if (!hasLogin) {
-      throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid login');
     }
 
     const hasPassword = typeof password === 'string' && password?.trim() !== '';
 
     if (!hasPassword) {
-      throw new HttpException('Invalid password', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid password');
     }
 
     const user = await this.userRepository.addUser(login, password);
@@ -80,37 +87,36 @@ export class UserService {
     { oldPassword, newPassword }: UserUpdatePasswordDto,
   ): Promise<UserResponseDto> {
     if (!validateUuid(userId)) {
-      throw new HttpException('User id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('User id is invalid');
     }
 
     const isValidOldPassword =
       typeof oldPassword === 'string' && oldPassword?.trim() !== '';
 
     if (!isValidOldPassword) {
-      throw new HttpException('Invalid old password', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid old password');
     }
 
     const isValidNewPassword =
       typeof newPassword === 'string' && newPassword?.trim() !== '';
 
     if (!isValidNewPassword) {
-      throw new HttpException('Invalid new password', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid new password');
     }
 
     const user = await this.userRepository.findUserById(userId);
 
     if (user === null) {
-      throw new HttpException(
-        `User with id ${userId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`User with id ${userId} is not found`);
     }
 
-    if (user.password !== oldPassword) {
-      throw new HttpException(
-        'Old password is incorrect',
-        HttpStatus.FORBIDDEN,
-      );
+    const isCorrectOldPassword = await this.authorizationService.verifyPassword(
+      oldPassword,
+      user.password,
+    );
+
+    if (!isCorrectOldPassword) {
+      throw new ForbiddenException('Old password is incorrect');
     }
 
     const updatedUser = await this.userRepository.updateUser(userId, {
@@ -123,16 +129,13 @@ export class UserService {
 
   async removeUser(userId: User['id']): Promise<void> {
     if (!validateUuid(userId)) {
-      throw new HttpException('User id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('User id is invalid');
     }
 
     const user = await this.userRepository.findUserById(userId);
 
     if (user === null) {
-      throw new HttpException(
-        `User with id ${userId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`User with id ${userId} is not found`);
     }
 
     await this.userRepository.removeUser(userId);

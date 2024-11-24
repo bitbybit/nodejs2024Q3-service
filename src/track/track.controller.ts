@@ -8,8 +8,11 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { AccessGuard } from '../authorization/access.guard';
 
 import { Track } from '../entities/track.entity';
 
@@ -18,6 +21,7 @@ import { TrackService } from './track.service';
 import { TrackCreateDto, TrackResponseDto, TrackUpdateDto } from './track.dto';
 
 @Controller('track')
+@UseGuards(AccessGuard)
 @ApiTags('Tracks')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
@@ -29,6 +33,10 @@ export class TrackController {
     status: HttpStatus.OK,
     description: 'Successful operation',
     type: [TrackResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async getTracks(): Promise<TrackResponseDto[]> {
     return await this.trackService.getTracks();
@@ -53,6 +61,10 @@ export class TrackController {
     status: HttpStatus.NOT_FOUND,
     description: 'Track was not found.',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async getTrack(@Param('id') id: Track['id']): Promise<TrackResponseDto> {
     return await this.trackService.getTrack(id);
   }
@@ -68,6 +80,10 @@ export class TrackController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Bad request. body does not contain required fields',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async createTrack(
     @Body()
@@ -95,6 +111,10 @@ export class TrackController {
     status: HttpStatus.NOT_FOUND,
     description: 'Track was not found.',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async updateTrack(
     @Param('id') id: Track['id'],
     @Body()
@@ -120,6 +140,10 @@ export class TrackController {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Track was not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async removeTrack(@Param('id') id: Track['id']): Promise<void> {
     await this.trackService.removeTrack(id);

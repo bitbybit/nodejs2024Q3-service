@@ -8,8 +8,11 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { AccessGuard } from '../authorization/access.guard';
 
 import { Album } from '../entities/album.entity';
 
@@ -18,6 +21,7 @@ import { AlbumService } from './album.service';
 import { AlbumCreateDto, AlbumResponseDto, AlbumUpdateDto } from './album.dto';
 
 @Controller('album')
+@UseGuards(AccessGuard)
 @ApiTags('Albums')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
@@ -29,6 +33,10 @@ export class AlbumController {
     status: HttpStatus.OK,
     description: 'Successful operation',
     type: [AlbumResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async getAlbums(): Promise<AlbumResponseDto[]> {
     return await this.albumService.getAlbums();
@@ -53,6 +61,10 @@ export class AlbumController {
     status: HttpStatus.NOT_FOUND,
     description: 'Album was not found.',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async getAlbum(@Param('id') id: Album['id']): Promise<AlbumResponseDto> {
     return await this.albumService.getAlbum(id);
   }
@@ -68,6 +80,10 @@ export class AlbumController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Bad request. body does not contain required fields',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async createAlbum(
     @Body()
@@ -95,6 +111,10 @@ export class AlbumController {
     status: HttpStatus.NOT_FOUND,
     description: 'Album was not found.',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async updateAlbum(
     @Param('id') id: Album['id'],
     @Body()
@@ -120,6 +140,10 @@ export class AlbumController {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Album was not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async removeAlbum(@Param('id') id: Album['id']): Promise<void> {
     await this.albumService.removeAlbum(id);
