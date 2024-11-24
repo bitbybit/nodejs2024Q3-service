@@ -1,23 +1,39 @@
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 
 import { type AppConfig } from '../app.module';
 
-import { AuthGuard } from './auth.guard';
+import { AccessGuard } from './access.guard';
+import { RefreshGuard } from './refresh.guard';
 
 import { AuthService } from './auth.service';
 
 @Module({
-  imports: [
-    JwtModule.registerAsync({
+  providers: [
+    AccessGuard,
+    RefreshGuard,
+    AuthService,
+
+    {
+      provide: 'ACCESS_TOKEN_SERVICE',
+      useFactory: (appConfig: AppConfig) =>
+        new JwtService({
+          secret: appConfig.jwtSecretKey,
+          signOptions: { expiresIn: appConfig.tokenExpireTime },
+        }),
       inject: ['APP_CONFIG'],
-      useFactory: (appConfig: AppConfig) => ({
-        secret: appConfig.jwtSecretKey,
-        signOptions: { expiresIn: appConfig.tokenExpireTime },
-      }),
-    }),
+    },
+
+    {
+      provide: 'REFRESH_TOKEN_SERVICE',
+      useFactory: (appConfig: AppConfig) =>
+        new JwtService({
+          secret: appConfig.jwtSecretRefreshKey,
+          signOptions: { expiresIn: appConfig.tokenRefreshExpireTime },
+        }),
+      inject: ['APP_CONFIG'],
+    },
   ],
-  providers: [AuthGuard, AuthService],
-  exports: [AuthGuard, AuthService],
+  exports: [AccessGuard, RefreshGuard, AuthService],
 })
 export class AuthModule {}

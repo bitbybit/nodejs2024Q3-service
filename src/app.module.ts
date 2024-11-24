@@ -12,7 +12,9 @@ export type AppConfig = {
   cryptSalt: number;
   dataSourceOptions: TypeOrmModuleOptions;
   jwtSecretKey: string;
+  jwtSecretRefreshKey: string;
   tokenExpireTime: string;
+  tokenRefreshExpireTime: string;
 };
 
 @Module({})
@@ -21,7 +23,9 @@ export class AppModule {
     cryptSalt,
     dataSourceOptions,
     jwtSecretKey,
+    jwtSecretRefreshKey,
     tokenExpireTime,
+    tokenRefreshExpireTime,
   }: AppConfig): DynamicModule {
     return {
       module: AppModule,
@@ -46,7 +50,9 @@ export class AppModule {
           useValue: {
             cryptSalt,
             jwtSecretKey,
+            jwtSecretRefreshKey,
             tokenExpireTime,
+            tokenRefreshExpireTime,
           },
         },
       ],

@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
 
 import { Track } from '../entities/track.entity';
@@ -44,15 +49,14 @@ export class FavoritesService {
     trackId: Track['id'],
   ): Promise<FavoritesAddedResponseDto> {
     if (!validateUuid(trackId)) {
-      throw new HttpException('Track id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Track id is invalid');
     }
 
     const track = await this.trackRepository.findTrackById(trackId);
 
     if (track === null) {
-      throw new HttpException(
+      throw new UnprocessableEntityException(
         `Track with id ${trackId} is not found`,
-        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
@@ -65,15 +69,14 @@ export class FavoritesService {
 
   async removeFavoriteTrack(trackId: Track['id']): Promise<void> {
     if (!validateUuid(trackId)) {
-      throw new HttpException('Track id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Track id is invalid');
     }
 
     const track = await this.trackRepository.findTrackById(trackId);
 
     if (track === null) {
-      throw new HttpException(
+      throw new UnprocessableEntityException(
         `Track with id ${trackId} is not found`,
-        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
@@ -82,9 +85,8 @@ export class FavoritesService {
     );
 
     if (favoriteTrack === null) {
-      throw new HttpException(
+      throw new NotFoundException(
         `Favorite track with id ${trackId} is not found`,
-        HttpStatus.NOT_FOUND,
       );
     }
 
@@ -95,15 +97,14 @@ export class FavoritesService {
     albumId: Album['id'],
   ): Promise<FavoritesAddedResponseDto> {
     if (!validateUuid(albumId)) {
-      throw new HttpException('Album id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Album id is invalid');
     }
 
     const album = await this.albumRepository.findAlbumById(albumId);
 
     if (album === null) {
-      throw new HttpException(
+      throw new UnprocessableEntityException(
         `Album with id ${albumId} is not found`,
-        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
@@ -116,15 +117,14 @@ export class FavoritesService {
 
   async removeFavoriteAlbum(albumId: Album['id']): Promise<void> {
     if (!validateUuid(albumId)) {
-      throw new HttpException('Album id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Album id is invalid');
     }
 
     const album = await this.albumRepository.findAlbumById(albumId);
 
     if (album === null) {
-      throw new HttpException(
+      throw new UnprocessableEntityException(
         `Album with id ${albumId} is not found`,
-        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
@@ -133,9 +133,8 @@ export class FavoritesService {
     );
 
     if (favoriteAlbum === null) {
-      throw new HttpException(
+      throw new NotFoundException(
         `Favorite album with id ${albumId} is not found`,
-        HttpStatus.NOT_FOUND,
       );
     }
 
@@ -146,15 +145,14 @@ export class FavoritesService {
     artistId: Artist['id'],
   ): Promise<FavoritesAddedResponseDto> {
     if (!validateUuid(artistId)) {
-      throw new HttpException('Artist id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Artist id is invalid');
     }
 
     const artist = await this.artistRepository.findArtistById(artistId);
 
     if (artist === null) {
-      throw new HttpException(
+      throw new UnprocessableEntityException(
         `Artist with id ${artistId} is not found`,
-        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
@@ -167,15 +165,14 @@ export class FavoritesService {
 
   async removeFavoriteArtist(artistId: Artist['id']): Promise<void> {
     if (!validateUuid(artistId)) {
-      throw new HttpException('Artist id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Artist id is invalid');
     }
 
     const artist = await this.artistRepository.findArtistById(artistId);
 
     if (artist === null) {
-      throw new HttpException(
+      throw new UnprocessableEntityException(
         `Artist with id ${artistId} is not found`,
-        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
@@ -183,9 +180,8 @@ export class FavoritesService {
       await this.favoritesRepository.findFavoriteArtistById(artistId);
 
     if (favoriteArtist === null) {
-      throw new HttpException(
+      throw new NotFoundException(
         `Favorite artist with id ${artistId} is not found`,
-        HttpStatus.NOT_FOUND,
       );
     }
 

@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { AuthGuard } from '../auth/auth.guard';
+import { AccessGuard } from '../auth/access.guard';
 
 import { User } from '../entities/user.entity';
 
@@ -25,7 +25,7 @@ import {
 } from './user.dto';
 
 @Controller('user')
-@UseGuards(AuthGuard)
+@UseGuards(AccessGuard)
 @ApiTags('Users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

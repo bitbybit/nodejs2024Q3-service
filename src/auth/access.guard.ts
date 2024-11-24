@@ -1,3 +1,4 @@
+import { type Request } from 'express';
 import {
   CanActivate,
   ExecutionContext,
@@ -8,11 +9,11 @@ import {
 import { AuthService } from './auth.service';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AccessGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
-  canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<Request>();
     const token = this.getToken(request);
 
     if (token === null) {
@@ -20,7 +21,7 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      request.user = this.authService.verifyToken(token);
+      await this.authService.verifyAccessToken(token);
 
       return true;
     } catch (error) {
@@ -28,7 +29,7 @@ export class AuthGuard implements CanActivate {
     }
   }
 
-  private getToken(request: any): string | null {
+  private getToken(request: Request): string | null {
     const authHeader = request.headers['authorization'];
 
     if (authHeader === undefined) {

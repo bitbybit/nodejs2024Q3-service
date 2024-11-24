@@ -251,3 +251,18 @@ docker-compose exec app npm run format
         - Server answer with `status code` **204** if the artist was in favorites and now it's deleted id is found and deleted
         - Server answer with `status code` **400** and corresponding message if `artistId` is invalid (not `uuid`)
         - Server answer with `status code` **404** and corresponding message if corresponding artist is not favorite
+
+* `Signup` (`auth/signup` route)
+    * `POST auth/signup` - send `login` and `password` to create a new `user`
+        - Server answer with `status code` **201** and corresponding message if dto is valid
+        - Server answer with `status code` **400** and corresponding message if dto is invalid (no `login` or `password`, or they are not a `strings`)
+* `Login` (`auth/login` route)
+    * `POST auth/login` - send `login` and `password` to get Access token and Refresh token (optionally)
+        - Server answer with `status code` **200** and tokens if dto is valid
+        - Server answer with `status code` **400** and corresponding message if dto is invalid (no `login` or `password`, or they are not a `strings`)
+        - Server answer with `status code` **403** and corresponding message if authentication failed (no user with such `login`, `password` doesn't match actual one, etc.)
+* `Refresh` (`auth/refresh` route)
+    * `POST auth/refresh` - send refresh token in body as `{ refreshToken }` to get a new pair of Access token and Refresh token
+        - Server answer with `status code` **200** and tokens in body if dto is valid
+        - Server answer with `status code` **401** and corresponding message if dto is invalid (no `refreshToken` in body)
+        - Server answer with `status code` **403** and corresponding message if authentication failed (Refresh token is invalid or expired)

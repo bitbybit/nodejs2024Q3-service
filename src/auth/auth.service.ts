@@ -12,15 +12,33 @@ export class AuthService {
     @Inject('APP_CONFIG')
     private readonly appConfig: AppConfig,
 
-    private readonly jwtService: JwtService,
+    @Inject('ACCESS_TOKEN_SERVICE')
+    private readonly accessTokenService: JwtService,
+
+    @Inject('REFRESH_TOKEN_SERVICE')
+    private readonly refreshTokenService: JwtService,
   ) {}
 
-  generateToken(login: User['login'], userId: User['id']): string {
-    return this.jwtService.sign({ login, userId });
+  async generateAccessToken(
+    login: User['login'],
+    userId: User['id'],
+  ): Promise<string> {
+    return await this.accessTokenService.signAsync({ login, userId });
   }
 
-  verifyToken(token: string): any {
-    return this.jwtService.verify(token);
+  async verifyAccessToken(token: string): Promise<object> {
+    return await this.accessTokenService.verifyAsync(token);
+  }
+
+  async generateRefreshToken(
+    login: User['login'],
+    userId: User['id'],
+  ): Promise<string> {
+    return await this.refreshTokenService.signAsync({ login, userId });
+  }
+
+  async verifyRefreshToken(token: string): Promise<object> {
+    return await this.refreshTokenService.verifyAsync(token);
   }
 
   async hashPassword(password: string): Promise<string> {

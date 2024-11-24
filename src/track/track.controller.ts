@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { AuthGuard } from '../auth/auth.guard';
+import { AccessGuard } from '../auth/access.guard';
 
 import { Track } from '../entities/track.entity';
 
@@ -21,7 +21,7 @@ import { TrackService } from './track.service';
 import { TrackCreateDto, TrackResponseDto, TrackUpdateDto } from './track.dto';
 
 @Controller('track')
-@UseGuards(AuthGuard)
+@UseGuards(AccessGuard)
 @ApiTags('Tracks')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}

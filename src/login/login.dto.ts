@@ -27,6 +27,13 @@ export class LoginDto {
   password: User['password'];
 }
 
+export class RefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String })
+  refreshToken: string;
+}
+
 export class LoginSignupResponseDto {
   @IsString()
   @IsNotEmpty()
@@ -44,4 +51,21 @@ export class LoginResponseDto {
   @IsNotEmpty()
   @ApiProperty({ type: String })
   accessToken: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String })
+  refreshToken: string;
+}
+
+export class RefreshTokenResponseDto {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String })
+  accessToken: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ type: String })
+  refreshToken: string;
 }

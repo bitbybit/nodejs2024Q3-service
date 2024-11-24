@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
 
 import { Track } from '../entities/track.entity';
@@ -43,16 +47,13 @@ export class TrackService {
 
   async getTrack(trackId: Track['id']): Promise<TrackResponseDto> {
     if (!validateUuid(trackId)) {
-      throw new HttpException('Track id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Track id is invalid');
     }
 
     const track = await this.trackRepository.findTrackById(trackId);
 
     if (track === null) {
-      throw new HttpException(
-        `Track with id ${trackId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Track with id ${trackId} is not found`);
     }
 
     return trackToTrackResponse(track);
@@ -67,7 +68,7 @@ export class TrackService {
     const isValidName = typeof name === 'string' && name?.trim() !== '';
 
     if (!isValidName) {
-      throw new HttpException('Invalid name', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid name');
     }
 
     const isValidArtistId =
@@ -75,7 +76,7 @@ export class TrackService {
       artistId === null;
 
     if (!isValidArtistId) {
-      throw new HttpException('Invalid artist id', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid artist id');
     }
 
     const isValidAlbumId =
@@ -83,22 +84,21 @@ export class TrackService {
       albumId === null;
 
     if (!isValidAlbumId) {
-      throw new HttpException('Invalid album id', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid album id');
     }
 
     const isValidDuration = typeof duration === 'number' && duration > 0;
 
     if (!isValidDuration) {
-      throw new HttpException('Invalid duration', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid duration');
     }
 
     if (artistId !== null) {
       const artist = this.artistRepository.findArtistById(artistId);
 
       if (artist === null) {
-        throw new HttpException(
+        throw new BadRequestException(
           `Artist with id ${artistId} is not found`,
-          HttpStatus.BAD_REQUEST,
         );
       }
     }
@@ -107,10 +107,7 @@ export class TrackService {
       const album = this.albumRepository.findAlbumById(albumId);
 
       if (album === null) {
-        throw new HttpException(
-          `Album with id ${albumId} is not found`,
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException(`Album with id ${albumId} is not found`);
       }
     }
 
@@ -129,7 +126,7 @@ export class TrackService {
     { name, artistId, albumId, duration }: TrackUpdateDto,
   ): Promise<TrackResponseDto> {
     if (!validateUuid(trackId)) {
-      throw new HttpException('Track id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Track id is invalid');
     }
 
     const hasName = name !== undefined;
@@ -138,7 +135,7 @@ export class TrackService {
       (typeof name === 'string' && name?.trim() !== '') || !hasName;
 
     if (!isValidName) {
-      throw new HttpException('Invalid name', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid name');
     }
 
     const hasArtistId = artistId !== undefined;
@@ -149,7 +146,7 @@ export class TrackService {
       !hasArtistId;
 
     if (!isValidArtistId) {
-      throw new HttpException('Invalid artist id', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid artist id');
     }
 
     const hasAlbumId = albumId !== undefined;
@@ -160,7 +157,7 @@ export class TrackService {
       !hasAlbumId;
 
     if (!isValidAlbumId) {
-      throw new HttpException('Invalid album id', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid album id');
     }
 
     const hasDuration = duration !== undefined;
@@ -169,16 +166,15 @@ export class TrackService {
       (typeof duration === 'number' && duration > 0) || !hasDuration;
 
     if (!isValidDuration) {
-      throw new HttpException('Invalid duration', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid duration');
     }
 
     if (hasArtistId) {
       const artist = this.artistRepository.findArtistById(artistId);
 
       if (artist === null) {
-        throw new HttpException(
+        throw new BadRequestException(
           `Artist with id ${artistId} is not found`,
-          HttpStatus.BAD_REQUEST,
         );
       }
     }
@@ -187,20 +183,14 @@ export class TrackService {
       const album = this.albumRepository.findAlbumById(albumId);
 
       if (album === null) {
-        throw new HttpException(
-          `Album with id ${albumId} is not found`,
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new BadRequestException(`Album with id ${albumId} is not found`);
       }
     }
 
     const track = await this.trackRepository.findTrackById(trackId);
 
     if (track === null) {
-      throw new HttpException(
-        `Track with id ${trackId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Track with id ${trackId} is not found`);
     }
 
     const updatedTrack = await this.trackRepository.updateTrack(trackId, {
@@ -219,16 +209,13 @@ export class TrackService {
 
   async removeTrack(trackId: Track['id']): Promise<void> {
     if (!validateUuid(trackId)) {
-      throw new HttpException('Track id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Track id is invalid');
     }
 
     const track = await this.trackRepository.findTrackById(trackId);
 
     if (track === null) {
-      throw new HttpException(
-        `Track with id ${trackId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Track with id ${trackId} is not found`);
     }
 
     await this.trackRepository.removeTrack(trackId);

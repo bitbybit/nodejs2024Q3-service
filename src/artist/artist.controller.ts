@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { AuthGuard } from '../auth/auth.guard';
+import { AccessGuard } from '../auth/access.guard';
 
 import { Artist } from '../entities/artist.entity';
 
@@ -25,7 +25,7 @@ import {
 } from './artist.dto';
 
 @Controller('artist')
-@UseGuards(AuthGuard)
+@UseGuards(AccessGuard)
 @ApiTags('Artists')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}

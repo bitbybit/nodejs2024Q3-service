@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 import { AuthService } from '../auth/auth.service';
 
@@ -9,6 +14,8 @@ import {
   LoginResponseDto,
   LoginSignupDto,
   LoginSignupResponseDto,
+  RefreshTokenDto,
+  RefreshTokenResponseDto,
 } from './login.dto';
 
 @Injectable()
@@ -25,19 +32,19 @@ export class LoginService {
     const hasLogin = typeof login === 'string' && login?.trim() !== '';
 
     if (!hasLogin) {
-      throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid login');
     }
 
     const hasPassword = typeof password === 'string' && password?.trim() !== '';
 
     if (!hasPassword) {
-      throw new HttpException('Invalid password', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid password');
     }
 
     const user = await this.userRepository.findUserByLogin(login);
 
     if (user !== null) {
-      throw new HttpException('Login already exists', HttpStatus.CONFLICT);
+      throw new ConflictException('Login already exists');
     }
 
     const { id } = await this.userRepository.addUser(login, password);
@@ -52,34 +59,76 @@ export class LoginService {
     const hasLogin = typeof login === 'string' && login?.trim() !== '';
 
     if (!hasLogin) {
-      throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid login');
     }
 
     const hasPassword = typeof password === 'string' && password?.trim() !== '';
 
     if (!hasPassword) {
-      throw new HttpException('Invalid password', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid password');
     }
 
     const user = await this.userRepository.findUserByLogin(login);
 
     if (user === null) {
-      throw new HttpException('No user with such login', HttpStatus.FORBIDDEN);
+      throw new ForbiddenException('No user with such login');
     }
 
-    const isCorrectPassword = this.authService.verifyPassword(
+    const isCorrectPassword = await this.authService.verifyPassword(
       password,
       user.password,
     );
 
     if (!isCorrectPassword) {
-      throw new HttpException('Password does not match', HttpStatus.FORBIDDEN);
+      throw new ForbiddenException('Password does not match');
     }
 
-    const accessToken = this.authService.generateToken(user.login, user.id);
+    const accessToken = await this.authService.generateAccessToken(
+      user.login,
+      user.id,
+    );
+
+    const refreshToken = await this.authService.generateRefreshToken(
+      user.login,
+      user.id,
+    );
+
+    await this.userRepository.updateUser(user.id, {
+      refreshToken,
+    });
 
     return {
       accessToken,
+      refreshToken,
+    };
+  }
+
+  async refreshToken({
+    refreshToken,
+  }: RefreshTokenDto): Promise<RefreshTokenResponseDto> {
+    const user = await this.userRepository.findUserByRefreshToken(refreshToken);
+
+    if (user === null) {
+      throw new ForbiddenException('Refresh token is invalid');
+    }
+
+    const newAccessToken = await this.authService.generateAccessToken(
+      user.login,
+      user.id,
+    );
+
+    const newRefreshToken = await this.authService.generateRefreshToken(
+      user.login,
+      user.id,
+    );
+
+    await this.userRepository.updateUser(user.id, {
+      refreshToken: newRefreshToken,
+    });
+
+    return {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     };
   }
 }

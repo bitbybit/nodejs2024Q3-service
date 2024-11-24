@@ -26,6 +26,12 @@ export class UserRepository extends Repository<User> {
     return await this.findOne({ where: { login } });
   }
 
+  async findUserByRefreshToken(
+    refreshToken: User['refreshToken'],
+  ): Promise<User | null> {
+    return await this.findOne({ where: { refreshToken } });
+  }
+
   async addUser(
     login: User['login'],
     password: User['password'],
@@ -34,6 +40,7 @@ export class UserRepository extends Repository<User> {
       login,
       password: await this.authService.hashPassword(password),
       version: 1,
+      refreshToken: '',
     });
 
     return await this.save(user);

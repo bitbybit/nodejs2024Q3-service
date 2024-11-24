@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { AuthGuard } from '../auth/auth.guard';
+import { AccessGuard } from '../auth/access.guard';
 
 import { Album } from '../entities/album.entity';
 
@@ -21,7 +21,7 @@ import { AlbumService } from './album.service';
 import { AlbumCreateDto, AlbumResponseDto, AlbumUpdateDto } from './album.dto';
 
 @Controller('album')
-@UseGuards(AuthGuard)
+@UseGuards(AccessGuard)
 @ApiTags('Albums')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}

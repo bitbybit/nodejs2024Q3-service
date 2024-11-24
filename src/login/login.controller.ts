@@ -1,5 +1,14 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { RefreshGuard } from '../auth/refresh.guard';
 
 import { LoginService } from './login.service';
 
@@ -8,6 +17,8 @@ import {
   LoginResponseDto,
   LoginSignupDto,
   LoginSignupResponseDto,
+  RefreshTokenDto,
+  RefreshTokenResponseDto,
 } from './login.dto';
 
 @Controller('auth')
@@ -55,5 +66,28 @@ export class LoginController {
   })
   async login(@Body() payload: LoginDto): Promise<LoginResponseDto> {
     return await this.loginService.login(payload);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(RefreshGuard)
+  @ApiOperation({ summary: 'Get a new pair of Access token and Refresh token' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Success',
+    type: RefreshTokenResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Refresh token is missing',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Refresh token is invalid or expired',
+  })
+  async refreshToken(
+    @Body() payload: RefreshTokenDto,
+  ): Promise<RefreshTokenResponseDto> {
+    return await this.loginService.refreshToken(payload);
   }
 }

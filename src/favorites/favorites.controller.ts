@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { AuthGuard } from '../auth/auth.guard';
+import { AccessGuard } from '../auth/access.guard';
 
 import { Track } from '../entities/track.entity';
 import { Album } from '../entities/album.entity';
@@ -24,7 +24,7 @@ import {
 } from './favorites.dto';
 
 @Controller('favs')
-@UseGuards(AuthGuard)
+@UseGuards(AccessGuard)
 @ApiTags('Favorites')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
