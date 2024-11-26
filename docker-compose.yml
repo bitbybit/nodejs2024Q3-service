@@ -1,0 +1,35 @@
+services:
+  db:
+    image: hubhubhubhub/node-db:latest
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+      - db_logs:/var/log/postgresql/
+    env_file:
+      - ./.env
+    networks:
+      - app_network
+    ports:
+      - "${DB_PORT:-5432}:${DB_PORT:-5432}"
+
+  app:
+    image: hubhubhubhub/node-app:latest
+    restart: always
+    volumes:
+      - ./src:/usr/src/app/src
+    depends_on:
+      - db
+    env_file:
+      - ./.env
+    networks:
+      - app_network
+    ports:
+      - "${PORT:-4000}:${PORT:-4000}"
+
+volumes:
+  db_data:
+  db_logs:
+
+networks:
+  app_network:
+    driver: bridge

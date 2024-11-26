@@ -9,7 +9,7 @@ import {
   ArtistCreateDto,
   ArtistResponseDto,
   ArtistUpdateDto,
-} from '../dtos/artist.dto';
+} from './artist.dto';
 
 export const artistToArtistResponse = ({
   id,

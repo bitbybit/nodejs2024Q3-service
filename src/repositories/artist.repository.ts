@@ -1,63 +1,62 @@
+import { DataSource, Repository } from 'typeorm';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import { Artist } from '../entities/artist.entity';
 
-import { TrackRepository } from './track.repository';
 import { AlbumRepository } from './album.repository';
 import { FavoritesRepository } from './favorites.repository';
+import { TrackRepository } from './track.repository';
 
 @Injectable()
-export class ArtistRepository {
-  private artists: Artist[] = [];
-
+export class ArtistRepository extends Repository<Artist> {
   constructor(
-    @Inject(forwardRef(() => TrackRepository))
-    private readonly trackRepository: TrackRepository,
+    private readonly dataSource: DataSource,
 
     @Inject(forwardRef(() => AlbumRepository))
     private readonly albumRepository: AlbumRepository,
 
     @Inject(forwardRef(() => FavoritesRepository))
     private readonly favoritesRepository: FavoritesRepository,
-  ) {}
+
+    @Inject(forwardRef(() => TrackRepository))
+    private readonly trackRepository: TrackRepository,
+  ) {
+    super(Artist, dataSource.createEntityManager());
+  }
 
   async getAllArtists(): Promise<Artist[]> {
-    return this.artists;
+    return this.find({ relations: ['albums', 'tracks'] });
   }
 
   async findArtistById(artistId: Artist['id']): Promise<Artist | null> {
-    return this.artists.find((artist) => artist.id === artistId) || null;
+    return this.findOne({
+      where: { id: artistId },
+      relations: ['albums', 'tracks'],
+    });
   }
 
   async addArtist(
     name: Artist['name'],
     grammy: Artist['grammy'],
   ): Promise<Artist> {
-    const artist = new Artist();
+    const artist = this.create({ name, grammy });
 
-    artist.name = name;
-    artist.grammy = grammy;
-    artist.albums = [];
-    artist.tracks = [];
-
-    this.artists.push(artist);
-
-    return artist;
+    return this.save(artist);
   }
 
   async updateArtist(
     artistId: Artist['id'],
     data: Partial<Artist>,
   ): Promise<Artist | null> {
-    const artist = this.artists.find((artist) => artist.id === artistId);
+    const artist = await this.findOneBy({ id: artistId });
 
-    if (artist !== undefined) {
-      Object.assign(artist, data);
-
-      return artist;
+    if (artist === null) {
+      return null;
     }
 
-    return null;
+    Object.assign(artist, data);
+
+    return this.save(artist);
   }
 
   async removeArtist(artistId: Artist['id']): Promise<void> {
@@ -65,6 +64,6 @@ export class ArtistRepository {
     await this.trackRepository.removeArtistReference(artistId);
     await this.albumRepository.removeArtistReference(artistId);
 
-    this.artists = this.artists.filter((artist) => artist.id !== artistId);
+    await this.delete(artistId);
   }
 }

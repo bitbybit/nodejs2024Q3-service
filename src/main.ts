@@ -1,15 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { config as setEnvVariables } from 'dotenv';
 
-import { AppModule } from './app.module';
-
-setEnvVariables();
-
-const PORT = Number(process.env.PORT ?? 4000);
+import { PORT } from './envs';
+import { AppDataSource } from './data-source';
+import { type AppConfig, AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const appConfig: AppConfig = {
+    dataSourceOptions: AppDataSource.options,
+  };
+
+  const app = await NestFactory.create(AppModule.forRoot(appConfig));
 
   const swagger = new DocumentBuilder()
     .setTitle('Home music library')
