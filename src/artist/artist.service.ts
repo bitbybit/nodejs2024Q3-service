@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
 
 import { Artist } from '../entities/artist.entity';
@@ -35,16 +39,13 @@ export class ArtistService {
 
   async getArtist(artistId: Artist['id']): Promise<ArtistResponseDto> {
     if (!validateUuid(artistId)) {
-      throw new HttpException('Artist id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Artist id is invalid');
     }
 
     const artist = await this.artistRepository.findArtistById(artistId);
 
     if (artist === null) {
-      throw new HttpException(
-        `Artist with id ${artistId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Artist with id ${artistId} is not found`);
     }
 
     return artistToArtistResponse(artist);
@@ -57,13 +58,13 @@ export class ArtistService {
     const isValidName = typeof name === 'string' && name?.trim() !== '';
 
     if (!isValidName) {
-      throw new HttpException('Invalid name', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid name');
     }
 
     const isValidGrammy = typeof grammy === 'boolean';
 
     if (!isValidGrammy) {
-      throw new HttpException('Invalid grammy', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid grammy');
     }
 
     const artist = await this.artistRepository.addArtist(name, grammy);
@@ -76,7 +77,7 @@ export class ArtistService {
     { name, grammy }: ArtistUpdateDto,
   ): Promise<ArtistResponseDto> {
     if (!validateUuid(artistId)) {
-      throw new HttpException('Artist id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Artist id is invalid');
     }
 
     const hasName = name !== undefined;
@@ -85,7 +86,7 @@ export class ArtistService {
       (typeof name === 'string' && name?.trim() !== '') || !hasName;
 
     if (!isValidName) {
-      throw new HttpException('Invalid name', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid name');
     }
 
     const hasGrammy = grammy !== undefined;
@@ -93,16 +94,13 @@ export class ArtistService {
     const isValidGrammy = typeof grammy === 'boolean' || !hasGrammy;
 
     if (!isValidGrammy) {
-      throw new HttpException('Invalid grammy', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid grammy');
     }
 
     const artist = await this.artistRepository.findArtistById(artistId);
 
     if (artist === null) {
-      throw new HttpException(
-        `Artist with id ${artistId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Artist with id ${artistId} is not found`);
     }
 
     const updatedArtist = await this.artistRepository.updateArtist(artistId, {
@@ -115,16 +113,13 @@ export class ArtistService {
 
   async removeArtist(artistId: Artist['id']): Promise<void> {
     if (!validateUuid(artistId)) {
-      throw new HttpException('Artist id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Artist id is invalid');
     }
 
     const artist = await this.artistRepository.findArtistById(artistId);
 
     if (artist === null) {
-      throw new HttpException(
-        `Artist with id ${artistId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Artist with id ${artistId} is not found`);
     }
 
     await this.artistRepository.removeArtist(artistId);

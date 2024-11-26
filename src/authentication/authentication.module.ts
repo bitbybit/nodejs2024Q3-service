@@ -3,13 +3,13 @@ import { Module } from '@nestjs/common';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { RepositoriesModule } from '../repositories/repositories.module';
 
-import { TrackService } from './track.service';
+import { AuthenticationService } from './authentication.service';
 
-import { TrackController } from './track.controller';
+import { AuthenticationController } from './authentication.controller';
 
 @Module({
-  controllers: [TrackController],
-  providers: [TrackService],
+  controllers: [AuthenticationController],
+  providers: [AuthenticationService],
   imports: [AuthorizationModule, RepositoriesModule],
 })
-export class TrackModule {}
+export class AuthenticationModule {}

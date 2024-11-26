@@ -17,6 +17,7 @@ services:
     restart: always
     volumes:
       - ./src:/usr/src/app/src
+      - ./logs:/usr/src/app/logs
     depends_on:
       - db
     env_file:
