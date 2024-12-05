@@ -21,6 +21,9 @@ export class User {
   @Column({ type: 'bigint' })
   _updatedAt: number = new Date().getTime();
 
+  @Column()
+  refreshToken: string;
+
   get createdAt(): number {
     return Number(this._createdAt);
   }

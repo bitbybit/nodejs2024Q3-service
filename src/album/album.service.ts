@@ -1,4 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { validate as validateUuid } from 'uuid';
 
 import { Album } from '../entities/album.entity';
@@ -38,16 +42,13 @@ export class AlbumService {
 
   async getAlbum(albumId: Album['id']): Promise<AlbumResponseDto> {
     if (!validateUuid(albumId)) {
-      throw new HttpException('Album id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Album id is invalid');
     }
 
     const album = await this.albumRepository.findAlbumById(albumId);
 
     if (album === null) {
-      throw new HttpException(
-        `Album with id ${albumId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Album with id ${albumId} is not found`);
     }
 
     return albumToAlbumResponse(album);
@@ -61,13 +62,13 @@ export class AlbumService {
     const isValidName = typeof name === 'string' && name?.trim() !== '';
 
     if (!isValidName) {
-      throw new HttpException('Invalid name', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid name');
     }
 
     const isValidYear = typeof year === 'number' && year > 0;
 
     if (!isValidYear) {
-      throw new HttpException('Invalid year', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid year');
     }
 
     const isValidArtistId =
@@ -75,16 +76,15 @@ export class AlbumService {
       artistId === null;
 
     if (!isValidArtistId) {
-      throw new HttpException('Invalid artist id', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid artist id');
     }
 
     if (artistId !== null) {
       const artist = this.artistRepository.findArtistById(artistId);
 
       if (artist === null) {
-        throw new HttpException(
+        throw new BadRequestException(
           `Artist with id ${artistId} is not found`,
-          HttpStatus.BAD_REQUEST,
         );
       }
     }
@@ -99,7 +99,7 @@ export class AlbumService {
     { name, year, artistId }: AlbumUpdateDto,
   ): Promise<AlbumResponseDto> {
     if (!validateUuid(albumId)) {
-      throw new HttpException('Album id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Album id is invalid');
     }
 
     const hasName = name !== undefined;
@@ -108,7 +108,7 @@ export class AlbumService {
       (typeof name === 'string' && name?.trim() !== '') || !hasName;
 
     if (!isValidName) {
-      throw new HttpException('Invalid name', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid name');
     }
 
     const hasYear = year !== undefined;
@@ -116,7 +116,7 @@ export class AlbumService {
     const isValidYear = (typeof year === 'number' && year > 0) || !hasYear;
 
     if (!isValidYear) {
-      throw new HttpException('Invalid year', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid year');
     }
 
     const hasArtistId = artistId !== undefined;
@@ -127,16 +127,15 @@ export class AlbumService {
       !hasArtistId;
 
     if (!isValidArtistId) {
-      throw new HttpException('Invalid artist id', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Invalid artist id');
     }
 
     if (hasArtistId) {
       const artist = this.artistRepository.findArtistById(artistId);
 
       if (artist === null) {
-        throw new HttpException(
+        throw new BadRequestException(
           `Artist with id ${artistId} is not found`,
-          HttpStatus.BAD_REQUEST,
         );
       }
     }
@@ -144,10 +143,7 @@ export class AlbumService {
     const album = await this.albumRepository.findAlbumById(albumId);
 
     if (album === null) {
-      throw new HttpException(
-        `Album with id ${albumId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Album with id ${albumId} is not found`);
     }
 
     const updatedAlbum = await this.albumRepository.updateAlbum(albumId, {
@@ -163,16 +159,13 @@ export class AlbumService {
 
   async removeAlbum(albumId: Album['id']): Promise<void> {
     if (!validateUuid(albumId)) {
-      throw new HttpException('Album id is invalid', HttpStatus.BAD_REQUEST);
+      throw new BadRequestException('Album id is invalid');
     }
 
     const album = await this.albumRepository.findAlbumById(albumId);
 
     if (album === null) {
-      throw new HttpException(
-        `Album with id ${albumId} is not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new NotFoundException(`Album with id ${albumId} is not found`);
     }
 
     await this.albumRepository.removeAlbum(albumId);

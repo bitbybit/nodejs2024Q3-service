@@ -6,8 +6,11 @@ import {
   HttpStatus,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { AccessGuard } from '../authorization/access.guard';
 
 import { Track } from '../entities/track.entity';
 import { Album } from '../entities/album.entity';
@@ -21,6 +24,7 @@ import {
 } from './favorites.dto';
 
 @Controller('favs')
+@UseGuards(AccessGuard)
 @ApiTags('Favorites')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
@@ -32,6 +36,10 @@ export class FavoritesController {
     status: HttpStatus.OK,
     description: 'Successful operation',
     type: FavoritesResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async getFavorites(): Promise<FavoritesResponseDto> {
     return await this.favoritesService.getFavorites();
@@ -55,6 +63,10 @@ export class FavoritesController {
   @ApiResponse({
     status: HttpStatus.UNPROCESSABLE_ENTITY,
     description: "Track with id doesn't exist.",
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async addFavoriteTrack(
     @Param('id') id: Track['id'],
@@ -80,6 +92,10 @@ export class FavoritesController {
     status: HttpStatus.NOT_FOUND,
     description: 'Track was not found.',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async removeFavoriteTrack(@Param('id') id: Track['id']): Promise<void> {
     await this.favoritesService.removeFavoriteTrack(id);
   }
@@ -102,6 +118,10 @@ export class FavoritesController {
   @ApiResponse({
     status: HttpStatus.UNPROCESSABLE_ENTITY,
     description: "Album with id doesn't exist.",
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async addFavoriteAlbum(
     @Param('id') id: Album['id'],
@@ -127,6 +147,10 @@ export class FavoritesController {
     status: HttpStatus.NOT_FOUND,
     description: 'Album was not found.',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async removeFavoriteAlbum(@Param('id') id: Album['id']): Promise<void> {
     await this.favoritesService.removeFavoriteAlbum(id);
   }
@@ -149,6 +173,10 @@ export class FavoritesController {
   @ApiResponse({
     status: HttpStatus.UNPROCESSABLE_ENTITY,
     description: "Artist with id doesn't exist.",
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async addFavoriteArtist(
     @Param('id') id: Artist['id'],
@@ -173,6 +201,10 @@ export class FavoritesController {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Artist was not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async removeFavoriteArtist(@Param('id') id: Artist['id']): Promise<void> {
     await this.favoritesService.removeFavoriteArtist(id);

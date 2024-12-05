@@ -8,8 +8,11 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { AccessGuard } from '../authorization/access.guard';
 
 import { Artist } from '../entities/artist.entity';
 
@@ -22,6 +25,7 @@ import {
 } from './artist.dto';
 
 @Controller('artist')
+@UseGuards(AccessGuard)
 @ApiTags('Artists')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
@@ -33,6 +37,10 @@ export class ArtistController {
     status: HttpStatus.OK,
     description: 'Successful operation',
     type: [ArtistResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async getArtists(): Promise<ArtistResponseDto[]> {
     return await this.artistService.getArtists();
@@ -57,6 +65,10 @@ export class ArtistController {
     status: HttpStatus.NOT_FOUND,
     description: 'Artist was not found.',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async getArtist(@Param('id') id: Artist['id']): Promise<ArtistResponseDto> {
     return await this.artistService.getArtist(id);
   }
@@ -72,6 +84,10 @@ export class ArtistController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Bad request. body does not contain required fields',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async createArtist(
     @Body() payload: ArtistCreateDto,
@@ -98,6 +114,10 @@ export class ArtistController {
     status: HttpStatus.NOT_FOUND,
     description: 'Artist was not found.',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async updateArtist(
     @Param('id') id: Artist['id'],
     @Body()
@@ -123,6 +143,10 @@ export class ArtistController {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Artist was not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async removeArtist(@Param('id') id: Artist['id']): Promise<void> {
     await this.artistService.removeArtist(id);

@@ -8,8 +8,11 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { AccessGuard } from '../authorization/access.guard';
 
 import { User } from '../entities/user.entity';
 
@@ -22,6 +25,7 @@ import {
 } from './user.dto';
 
 @Controller('user')
+@UseGuards(AccessGuard)
 @ApiTags('Users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -33,6 +37,10 @@ export class UserController {
     status: HttpStatus.OK,
     description: 'Successful operation',
     type: [UserResponseDto],
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async getUsers(): Promise<UserResponseDto[]> {
     return await this.userService.getUsers();
@@ -57,6 +65,10 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'User not found',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async getUser(@Param('id') id: User['id']): Promise<UserResponseDto> {
     return await this.userService.getUser(id);
   }
@@ -72,6 +84,10 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Bad request. body does not contain required fields',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async createUser(@Body() payload: UserCreateDto): Promise<UserResponseDto> {
     return await this.userService.createUser(payload);
@@ -100,6 +116,10 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'User not found',
   })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
+  })
   async updateUserPassword(
     @Param('id') id: User['id'],
     @Body()
@@ -125,6 +145,10 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'User not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Access token is missing or invalid',
   })
   async removeUser(@Param('id') id: User['id']): Promise<void> {
     await this.userService.removeUser(id);
